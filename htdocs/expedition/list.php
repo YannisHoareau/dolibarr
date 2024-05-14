@@ -520,7 +520,11 @@ $arrayofmassactions = array(
 	'classifyclose'=>$langs->trans("Close"),
 	'presend'  => img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
 );
-if (in_array($massaction, array('presend'))) {
+if ($user->rights->facture->creer) {
+	$langs->load('orders');
+	$arrayofmassactions['createbills'] = img_picto('', 'bill', 'class="pictofixedwidth"').$langs->trans("CreateInvoiceForThisCustomer");
+}
+if (in_array($massaction, array('presend', 'createbills'))) {
 	$arrayofmassactions = array();
 }
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
