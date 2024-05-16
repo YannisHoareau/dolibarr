@@ -243,7 +243,7 @@ if (empty($reshook)) {
 				// If option "one bill per third" is set, and an invoice for this thirdparty was already created, we re-use it.
 				$objecttmp = $TFactThird[$expd->socid];
 			} else {
-				// If we want one invoice per order or if there is no first invoice yet for this thirdparty.
+				// If we want one invoice per sending or if there is no first invoice yet for this thirdparty.
 				$objecttmp->socid = $expd->socid;
 				$objecttmp->thirdparty = $expd->thirdparty;
 
@@ -318,7 +318,7 @@ if (empty($reshook)) {
 
 					for ($i = 0; $i < $num; $i++) {
 						$desc = ($lines[$i]->desc ? $lines[$i]->desc : '');
-						// If we build one invoice for several sendings, we must put the ref of order on the invoice line
+						// If we build one invoice for several sendings, we must put the ref of sending on the invoice line
 						if (!empty($createbills_onebythird)) {
 							$desc = dol_concatdesc($desc, $langs->trans("Order").' '.$expd->ref.' - '.dol_print_date($expd->date, 'day'));
 						}
@@ -381,7 +381,7 @@ if (empty($reshook)) {
 							$objecttmp->context['createfromclone'];
 
 							$rang = ($nbSendings > 1) ? -1 : $lines[$i]->rang;
-							//there may already be rows from previous orders
+							//there may already be rows from previous sendings
 							if (!empty($createbills_onebythird)) {
 								$rang = $TFactThirdNbLines[$expd->socid];
 							}
@@ -418,7 +418,7 @@ if (empty($reshook)) {
 							);
 							if ($result > 0) {
 								$lineid = $result;
-								if (!empty($createbills_onebythird)) //increment rang to keep order
+								if (!empty($createbills_onebythird)) //increment rang to keep sending
 									$TFactThirdNbLines[$rcp->socid]++;
 							} else {
 								$lineid = 0;
