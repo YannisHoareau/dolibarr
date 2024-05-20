@@ -1591,8 +1591,9 @@ class Expedition extends CommonObject
 
 		$sql = "SELECT cd.rowid, cd.fk_product, cd.label as custom_label, cd.description, cd.qty as qty_asked, cd.product_type, cd.fk_unit";
 		$sql .= ", cd.total_ht, cd.total_localtax1, cd.total_localtax2, cd.total_ttc, cd.total_tva";
+		$sql .= ", cd.fk_remise_except, cd.fk_product_fournisseur_price as fk_fournprice";
 		$sql .= ", cd.vat_src_code, cd.tva_tx, cd.localtax1_tx, cd.localtax2_tx, cd.localtax1_type, cd.localtax2_type, cd.info_bits, cd.price, cd.subprice, cd.remise_percent,cd.buy_price_ht as pa_ht";
-		$sql .= ", cd.fk_multicurrency, cd.multicurrency_code, cd.multicurrency_subprice, cd.multicurrency_total_ht, cd.multicurrency_total_tva, cd.multicurrency_total_ttc, cd.rang";
+		$sql .= ", cd.fk_multicurrency, cd.multicurrency_code, cd.multicurrency_subprice, cd.multicurrency_total_ht, cd.multicurrency_total_tva, cd.multicurrency_total_ttc, cd.rang, cd.date_start, cd.date_end";
 		$sql .= ", ed.rowid as line_id, ed.qty as qty_shipped, ed.fk_origin_line, ed.fk_entrepot";
 		$sql .= ", p.ref as product_ref, p.label as product_label, p.fk_product_type";
 		$sql .= ", p.weight, p.weight_units, p.length, p.length_units, p.surface, p.surface_units, p.volume, p.volume_units, p.tosell as product_tosell, p.tobuy as product_tobuy, p.tobatch as product_tobatch";
@@ -1658,6 +1659,7 @@ class Expedition extends CommonObject
 				$line->product_tosell = $obj->product_tosell;
 				$line->product_tobuy = $obj->product_tobuy;
 				$line->product_tobatch = $obj->product_tobatch;
+				$line->fk_fournprice = $obj->fk_fournprice;
 				$line->label = $obj->custom_label;
 				$line->description    	= $obj->description;
 				$line->qty_asked      	= $obj->qty_asked;
@@ -1695,6 +1697,7 @@ class Expedition extends CommonObject
 				$line->info_bits = $obj->info_bits;
 				$line->price = $obj->price;
 				$line->subprice = $obj->subprice;
+				$line->fk_remise_except = $obj->fk_remise_except;
 				$line->remise_percent = $obj->remise_percent;
 
 				$this->total_ht += $tabprice[0];
@@ -1702,6 +1705,9 @@ class Expedition extends CommonObject
 				$this->total_ttc += $tabprice[2];
 				$this->total_localtax1 += $tabprice[9];
 				$this->total_localtax2 += $tabprice[10];
+
+				$line->date_start       = $this->db->jdate($obj->date_start);
+				$line->date_end         = $this->db->jdate($obj->date_end);
 
 				// Multicurrency
 				$this->fk_multicurrency = $obj->fk_multicurrency;
