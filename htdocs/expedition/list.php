@@ -424,7 +424,7 @@ if (empty($reshook)) {
 							if ($result > 0) {
 								$lineid = $result;
 								if (!empty($createbills_onebythird)) //increment rang to keep sending
-									$TFactThirdNbLines[$rcp->socid]++;
+									$TFactThirdNbLines[$expd->socid]++;
 							} else {
 								$lineid = 0;
 								$error++;
