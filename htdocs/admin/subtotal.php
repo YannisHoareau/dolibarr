@@ -73,11 +73,14 @@ $conditions = array(
  *  Actions
  */
 
-
 if (preg_match('/^SUBTOTAL_.*$/', $action)) {
-	$value = getDolGlobalInt($action, 0);
-	$value == 0 ? $value = 1 : $value = 0;
-	dolibarr_set_const($db, $action, $value, 'chaine', 0, '', $conf->entity);
+	if (preg_match('/^.*_MAX_DEPTH$/', $action)) {
+		dolibarr_set_const($db, $action, GETPOST($action), 'int', 0, '', $conf->entity);
+	} else {
+		$value = getDolGlobalInt($action, 0);
+		$value == 0 ? $value = 1 : $value = 0;
+		dolibarr_set_const($db, $action, $value, 'chaine', 0, '', $conf->entity);
+	}
 }
 
 
@@ -116,19 +119,27 @@ if (empty($conf->use_javascript_ajax)) {
 		print '<td>'.$langs->trans($desc).'</td>';
 
 		print '<td>';
-		$value = getDolGlobalInt($constante_title, 0);
+		$value_title = getDolGlobalInt($constante_title, 0);
 		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action='.$constante_title.'&token='.newToken().'">';
-		print $value == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
+		print $value_title == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
 		print '</td>';
 
 		print '<td>';
-		$value = getDolGlobalInt($constante_subtotal, 0);
+		$value_subtotal = getDolGlobalInt($constante_subtotal, 0);
 		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action='.$constante_subtotal.'&token='.newToken().'">';
-		print $value == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
+		print $value_subtotal == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
 		print '</td>';
 
 		print '<td>';
-		print '<input size="3" type="text" name="SUBTOTAL_'.$const.'_MAX_DEPTH" value="'.getDolGlobalString('SUBTOTAL_'.$const.'_MAX_DEPTH').'"></td>';
+		$can_modify = !($value_subtotal == 0 && $value_title == 0);
+		print '<form action="'.$_SERVER["PHP_SELF"].'?action='.'SUBTOTAL_'.$const.'_MAX_DEPTH'.'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="updateMask">';
+		print '<input size="3" type="text"';
+		print $can_modify ? '' : ' readonly ';
+		print 'name="SUBTOTAL_'.$const.'_MAX_DEPTH" value="'.getDolGlobalString('SUBTOTAL_'.$const.'_MAX_DEPTH', 2).'">';
+		print $can_modify ? '<input type="submit" class="button button-edit reposition smallpaddingimp" name="Button"value="'.$langs->trans("Modify").'">' : '';
+		print '</form>';
 		print '</td>';
 
 		print '</tr>';
