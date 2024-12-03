@@ -47,13 +47,14 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/margin/lib/margins.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/multicurrency/class/multicurrency.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonincoterm.class.php';
+require_once DOL_DOCUMENT_ROOT.'/subtotal/class/commonsubtotal.class.php';
 
 /**
  *	Class to manage proposals
  */
 class Propal extends CommonObject
 {
-	use CommonIncoterm;
+	use CommonIncoterm, CommonSubtotal;
 
 	/**
 	 * @var string code
@@ -635,13 +636,78 @@ class Propal extends CommonObject
 	 *    	@return    	int         	    			>0 if OK, <0 if KO
 	 *    	@see       	add_product()
 	 */
-	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = array(), $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0, $noupdateafterinsertline = 0)
-	{
+	public function addline(
+		$desc,
+		$pu_ht,
+		$qty,
+		$txtva,
+		$txlocaltax1 = 0.0,
+		$txlocaltax2 = 0.0,
+		$fk_product = 0,
+		$remise_percent = 0.0,
+		$price_base_type = 'HT',
+		$pu_ttc = 0.0,
+		$info_bits = 0,
+		$type = 0,
+		$rang = -1,
+		$special_code = 0,
+		$fk_parent_line = 0,
+		$fk_fournprice = 0,
+		$pa_ht = 0,
+		$label = '',
+		$date_start = '',
+		$date_end = '',
+		$array_options = array(),
+		$fk_unit = null,
+		$origin = '',
+		$origin_id = 0,
+		$pu_ht_devise = 0,
+		$fk_remise_except = 0,
+		$noupdateafterinsertline = 0
+	) {
 		global $mysoc, $conf, $langs;
+	// TODO : clean this when not needed anymore
+//		var_dump($desc,
+//			'$pu_ht', $pu_ht,
+//			'qty', $qty,
+//			$txtva,
+//			$txlocaltax1,
+//			$txlocaltax2,
+//			'$fk_product', $fk_product,
+//			$remise_percent,
+//			$price_base_type,
+//			$pu_ttc,
+//			$info_bits,
+//			'$type', $type,
+//			$rang,
+//			'$special_code', $special_code,
+//			$fk_parent_line,
+//			$fk_fournprice,
+//			$pa_ht,
+//			$label,
+//			$date_start,
+//			$date_end,
+//			$array_options,
+//			$fk_unit,
+//			$origin,
+//			$origin_id,
+//			$pu_ht_devise,
+//			$fk_remise_except,
+//			$noupdateafterinsertline);
+
+//		$this->addSubtotalLine();
 
 		dol_syslog(get_class($this)."::addline propalid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_except=$remise_percent, price_base_type=$price_base_type, pu_ttc=$pu_ttc, info_bits=$info_bits, type=$type, fk_remise_except=".$fk_remise_except);
 
 		if ($this->statut == self::STATUS_DRAFT) {
+
+			if (isModEnabled('subtotal')) {
+				if (in_array($special_code, ['811', '812'])) {
+					$this->addSubtotalLine();
+					return 1;
+				}
+			}
+
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 
 			// Clean parameters

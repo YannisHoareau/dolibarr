@@ -2285,9 +2285,11 @@ if (empty($reshook)) {
 			$price_base_type = (GETPOST('price_base_type', 'alpha') ? GETPOST('price_base_type', 'alpha') : 'HT');
 			$tva_npr = "";
 
-			// Define special_code for special lines
-			$special_code = 0;
-			// if (!GETPOST(qty)) $special_code=3; // Options should not exists on invoices
+			if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
+				$special_code = GETPOSTINT('special_code');
+			} else {
+				$special_code = 0;
+			}
 
 			// Replaces $pu with that of the product
 			// Replaces $desc with that of the product

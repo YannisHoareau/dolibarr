@@ -44,13 +44,6 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 // Load translation files required by the page
 $langs->loadLangs(array('admin', 'subtotal', 'errors'));
 $action = GETPOST('action', 'aZ09');
-// Possible modes are:
-// dolibarr_details
-// dolibarr_notes
-// dolibarr_readonly
-// dolibarr_mailings
-// Full (not sure this one is used)
-$mode = GETPOST('mode') ? GETPOST('mode', 'alpha') : 'dolibarr_notes';
 
 if (!$user->admin) {
 	accessforbidden();
@@ -98,10 +91,11 @@ if (empty($conf->use_javascript_ajax)) {
 } else {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<td width="1100">'.$langs->trans("ActivateSubtotal").'</td>'; #TODO
-	print '<td>'.$langs->trans("Title").'</td>'; #TODO
-	print '<td>'.$langs->trans("Subtotal").'</td>'; #TODO
-	print '<td>'.$langs->trans("MaxDepthLevel").'</td>'; #TODO
+	#TODO translations
+	print '<td width="1100">'.$langs->trans("ActivateSubtotal").'</td>';
+	print '<td class="center">'.$langs->trans("Title").'</td>';
+	print '<td class="center">'.$langs->trans("Subtotal").'</td>';
+	print '<td class="center">'.$langs->trans("MaxDepthLevel").'</td>';
 	#print '<td>'.$langs->trans("Comment").'</td>'; #TODO : comment ?
 	print "</tr>\n";
 
@@ -118,19 +112,19 @@ if (empty($conf->use_javascript_ajax)) {
 		print '<tr class="oddeven">';
 		print '<td>'.$langs->trans($desc).'</td>';
 
-		print '<td>';
+		print '<td class="center">';
 		$value_title = getDolGlobalInt($constante_title, 0);
 		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action='.$constante_title.'&token='.newToken().'">';
 		print $value_title == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
 		print '</td>';
 
-		print '<td>';
+		print '<td class="center">';
 		$value_subtotal = getDolGlobalInt($constante_subtotal, 0);
 		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action='.$constante_subtotal.'&token='.newToken().'">';
 		print $value_subtotal == 0 ? img_picto($langs->trans("Disabled"), 'switch_off') : img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
 		print '</td>';
 
-		print '<td>';
+		print '<td class="center">';
 		$can_modify = !($value_subtotal == 0 && $value_title == 0);
 		print '<form action="'.$_SERVER["PHP_SELF"].'?action='.'SUBTOTAL_'.$const.'_MAX_DEPTH'.'" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -151,90 +145,29 @@ if (empty($conf->use_javascript_ajax)) {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>'.$langs->trans("Other").'</td>';
-	print '<td class="center"></td>';
+	print '<td></td>';
 	print "</tr>\n";
 
-	$constante = 'FCKEDITOR_ENANLE_SPECIALCHAR';
-	print '<!-- constant = '.$constante.' -->'."\n";
 	print '<tr class="oddeven">';
 	print '<td>';
-	print $langs->trans('SpecialCharActivation');
+	print $langs->trans('TitleSubtotalPDFbackColor');
 	print '</td>';
 	print '<td class="center width100">';
-	$value = getDolGlobalInt($constante, 0);
-	if ($value == 0) {
-		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action=enable_'.strtolower($const).'&token='.newToken().'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-	} elseif ($value == 1) {
-		print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action=disable_'.strtolower($const).'&token='.newToken().'">'.img_picto($langs->trans("Enabled"), 'switch_on').'</a>';
-	}
+	print 'COLOR PICKER HERE';
+	print "</td>";
+	print '</tr>';
 
+	print '<tr class="oddeven">';
+	print '<td>';
+	print $langs->trans('CommentPDFbackColor ?');
+	print '</td>';
+	print '<td class="center width100">';
+	print 'COLOR PICKER HERE';
 	print "</td>";
 	print '</tr>';
 
 	print '</table>'."\n";
 
-	print '<br>'."\n";
-
-
-	print '<form name="formtest" method="POST" action="'.$_SERVER["PHP_SELF"].'">'."\n";
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="page_y" value="">';
-
-	// Skins
-	//show_skin(null, 1);
-	//print '<br>'."\n";
-
-	$listofmodes = array('dolibarr_readonly', 'dolibarr_details', 'dolibarr_notes', 'dolibarr_mailings', 'Full', 'Full_inline');
-	$linkstomode = '';
-	foreach ($listofmodes as $newmode) {
-		if ($linkstomode) {
-			$linkstomode .= ' - ';
-		}
-		$linkstomode .= '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?mode='.$newmode.'">';
-		if ($mode == $newmode) {
-			$linkstomode .= '<strong>';
-		}
-		$linkstomode .= $newmode;
-		if ($mode == $newmode) {
-			$linkstomode .= '</strong>';
-		}
-		$linkstomode .= '</a>';
-	}
-	$linkstomode .= '';
-	print load_fiche_titre($langs->trans("TestSubmitForm"), $linkstomode, '');
-	print '<input type="hidden" name="mode" value="'.dol_escape_htmltag($mode).'">';
-	if ($mode != 'Full_inline') {
-		$uselocalbrowser = true;
-		$readonly = ($mode == 'dolibarr_readonly' ? 1 : 0);
-		$editor = new DolEditor('formtestfield', getDolGlobalString('FCKEDITOR_TEST', 'Test'), '', 200, $mode, 'In', true, $uselocalbrowser, 1, 120, '8', $readonly);
-		$editor->Create();
-	} else {
-		// CKEditor inline enabled with the contenteditable="true"
-		print '<div style="border: 1px solid #888;" contenteditable="true">';
-		print getDolGlobalString('FCKEDITOR_TEST');
-		print '</div>';
-	}
-//	print $form->buttonsSaveCancel("Save", '', array(), 0, 'reposition');
-	print '<div id="divforlog"></div>';
-	print '</form>'."\n";
-
-	// Add env of ckeditor
-	// This is to show how CKEditor detect browser to understand why editor is disabled or not. To help debug.
-	/*
-		print '<br><script type="text/javascript">
-		function jsdump(obj, id) {
-			var out = \'\';
-			for (var i in obj) {
-				out += i + ": " + obj[i] + "<br>\n";
-			}
-
-			jQuery("#"+id).html(out);
-		}
-
-		jsdump(CKEDITOR.env, "divforlog");
-		</script>';
-	}
-	*/
 }
 
 // End of page

@@ -42,6 +42,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/margin/lib/margins.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/multicurrency/class/multicurrency.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/subtotal/class/commonsubtotal.class.php';
 
 
 /**
@@ -49,6 +50,8 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
  */
 class Commande extends CommonOrder
 {
+	use CommonSubtotal;
+
 	/**
 	 * @var string ID to identify managed object
 	 */
@@ -1531,8 +1534,71 @@ class Commande extends CommonOrder
 	 *	par l'appelant par la methode get_default_tva(societe_vendeuse,societe_acheteuse,produit)
 	 *	et le desc doit deja avoir la bonne valeur (a l'appelant de gerer le multilangue)
 	 */
-	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0, $txlocaltax2 = 0, $fk_product = 0, $remise_percent = 0, $info_bits = 0, $fk_remise_except = 0, $price_base_type = 'HT', $pu_ttc = 0, $date_start = '', $date_end = '', $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = null, $pa_ht = 0, $label = '', $array_options = array(), $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $ref_ext = '', $noupdateafterinsertline = 0)
-	{
+	public function addline(
+		$desc,
+		$pu_ht,
+		$qty,
+		$txtva,
+		$txlocaltax1 = 0,
+		$txlocaltax2 = 0,
+		$fk_product = 0,
+		$remise_percent = 0,
+		$info_bits = 0,
+		$fk_remise_except = 0,
+		$price_base_type = 'HT',
+		$pu_ttc = 0,
+		$date_start = '',
+		$date_end = '',
+		$type = 0,
+		$rang = -1,
+		$special_code = 0,
+		$fk_parent_line = 0,
+		$fk_fournprice = null,
+		$pa_ht = 0,
+		$label = '',
+		$array_options = array(),
+		$fk_unit = null,
+		$origin = '',
+		$origin_id = 0,
+		$pu_ht_devise = 0,
+		$ref_ext = '',
+		$noupdateafterinsertline = 0
+	) {
+		// TODO : clean this when not needed anymore
+//		var_dump(
+//			"nom ligne",
+//			$desc,
+//			$pu_ht,
+//			"num ligne",
+//			$qty,
+//			$txtva,
+//			$txlocaltax1,
+//			$txlocaltax2,
+//			$fk_product,
+//			$remise_percent,
+//			$info_bits,
+//			$fk_remise_except,
+//			$price_base_type,
+//			$pu_ttc,
+//			$date_start,
+//			$date_end,
+//			"Product type",
+//			$type,
+//			$rang,
+//			"Special code",
+//			$special_code,
+//			$fk_parent_line,
+//			$fk_fournprice,
+//			$pa_ht,
+//			$label,
+//			$array_options,
+//			$fk_unit,
+//			$origin,
+//			$origin_id,
+//			$pu_ht_devise,
+//			$ref_ext,
+//			$noupdateafterinsertline);
+//		exit();
 		global $mysoc, $conf, $langs, $user;
 
 		$logtext = "::addline commandeid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_percent=$remise_percent";
@@ -1541,6 +1607,14 @@ class Commande extends CommonOrder
 		dol_syslog(get_class($this).$logtext, LOG_DEBUG);
 
 		if ($this->statut == self::STATUS_DRAFT) {
+
+			if (isModEnabled('subtotal')) {
+				if (in_array($special_code, ['811', '812'])) {
+					$this->addSubtotalLine();
+					return 1;
+				}
+			}
+
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 
 			// Clean parameters
