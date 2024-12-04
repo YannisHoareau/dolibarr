@@ -2154,6 +2154,60 @@ if (empty($reshook)) {
 			}
 			$result = $object->updateline($line->id, $line->desc, $line->subprice, $line->qty, $remise_percent, $line->date_start, $line->date_end, $tvatx, $line->localtax1_tx, $line->localtax2_tx, 'HT', $line->info_bits, $line->product_type, $line->fk_parent_line, 0, $line->fk_fournprice, $line->pa_ht, $line->label, $line->special_code, $line->array_options, $line->situation_percent, $line->fk_unit, $line->multicurrency_subprice);
 		}
+	} elseif ($action == 'addline' && GETPOST('addsubtotalline', 'alpha') && $usercancreate) {
+		// Add a new subtotalline
+
+		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
+
+		// Handling adding line for subtotal module
+		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
+			$langs->load('subtotal');
+			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
+			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
+			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
+			// Insert line
+			$result = $object->addSubtotalLine($desc, $depth);
+
+			if ($result > 0) {
+				// TODO refresh pdf ?
+//				$ret = $object->fetch($object->id); // Reload to get new records
+//				$object->fetch_thirdparty();
+//
+//				if (!getDolGlobalString('MAIN_DISABLE_PDF_AUTOUPDATE')) {
+//					// Define output language
+//					$outputlangs = $langs;
+//					$newlang = GETPOST('lang_id', 'alpha');
+//					if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang)) {
+//						$newlang = $object->thirdparty->default_lang;
+//					}
+//					if (!empty($newlang)) {
+//						$outputlangs = new Translate("", $conf);
+//						$outputlangs->setDefaultLang($newlang);
+//					}
+//
+//					$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
+//				}
+
+				unset($_POST['prod_entry_mode']);
+				unset($_POST['subtotal_desc']);
+				unset($_POST['subtotal_depth']);
+				unset($_POST['addsubtotalline']);
+				unset($_POST['type']);
+				unset($_POST['idprod']);
+				unset($_POST['pbq']);
+
+				unset($_POST['date_start']);
+				unset($_POST['date_startday']);
+				unset($_POST['date_startmonth']);
+				unset($_POST['date_startyear']);
+				unset($_POST['date_end']);
+				unset($_POST['date_endday']);
+				unset($_POST['date_endmonth']);
+				unset($_POST['date_endyear']);
+			} else {
+				setEventMessages($object->error, $object->errors, 'errors');
+			}
+		}
 	} elseif ($action == 'addline' && !GETPOST('submitforalllines', 'alpha') && !GETPOST('submitforallmargins', 'alpha') && $usercancreate) {		// Add a new line
 		$langs->load('errors');
 		$error = 0;
@@ -2285,11 +2339,9 @@ if (empty($reshook)) {
 			$price_base_type = (GETPOST('price_base_type', 'alpha') ? GETPOST('price_base_type', 'alpha') : 'HT');
 			$tva_npr = "";
 
-			if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
-				$special_code = GETPOSTINT('special_code');
-			} else {
-				$special_code = 0;
-			}
+			// Define special_code for special lines
+			$special_code = 0;
+			// if (!GETPOST(qty)) $special_code=3; // Options should not exists on invoices
 
 			// Replaces $pu with that of the product
 			// Replaces $desc with that of the product

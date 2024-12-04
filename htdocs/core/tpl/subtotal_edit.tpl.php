@@ -59,10 +59,8 @@ if (empty($object) || !is_object($object)) {
 @phan-var-force string $var
 ';
 
-// Handle subtotal line edit
-if ($line->special_code == $this->getSpecialCode()) :
-	include DOL_DOCUMENT_ROOT.'/core/tpl/subtotal_edit.tpl.php';
-else :
+var_dump('yes');
+exit();
 
 $usemargins = 0;
 if (isModEnabled('margin') && !empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande'))) {
@@ -659,4 +657,3 @@ jQuery(document).ready(function()
 
 </script>
 <!-- END PHP TEMPLATE objectline_edit.tpl.php -->
-<?php endif; ?>

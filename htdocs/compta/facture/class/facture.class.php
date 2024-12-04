@@ -3890,44 +3890,6 @@ class Facture extends CommonInvoice
 		$ref_ext = '',
 		$noupdateafterinsertline = 0
 	) {
-		// TODO : clean this when not needed anymore
-//		var_dump(
-//			"nom ligne",
-//			$desc,
-//			$pu_ht,
-//			"num ligne",
-//			$qty,
-//			$txtva,
-//			$txlocaltax1,
-//			$txlocaltax2,
-//			"Fkproduct",
-//			$fk_product,
-//			$remise_percent,
-//			$date_start,
-//			$date_end,
-//			$fk_code_ventilation,
-//			$info_bits,
-//			$fk_remise_except,
-//			$price_base_type,
-//			$pu_ttc,
-//			"Product type",
-//			$type,
-//			$rang,
-//			"Special code",
-//			$special_code,
-//			$origin,
-//			$origin_id,
-//			$fk_parent_line,
-//			$fk_fournprice,
-//			$pa_ht,
-//			$label,
-//			$array_options,
-//			$situation_percent,
-//			$fk_prev_id,
-//			$fk_unit,
-//			$pu_ht_devise,
-//			$ref_ext,
-//			$noupdateafterinsertline);
 		// Deprecation warning
 		if ($label) {
 			dol_syslog(__METHOD__.": using line label is deprecated", LOG_WARNING);
@@ -3939,14 +3901,6 @@ class Facture extends CommonInvoice
 		dol_syslog(get_class($this)."::addline id=$this->id, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, txlocaltax1=$txlocaltax1, txlocaltax2=$txlocaltax2, fk_product=$fk_product, remise_percent=$remise_percent, date_start=$date_start, date_end=$date_end, fk_code_ventilation=$fk_code_ventilation, info_bits=$info_bits, fk_remise_except=$fk_remise_except, price_base_type=$price_base_type, pu_ttc=$pu_ttc, type=$type, fk_unit=$fk_unit, desc=".dol_trunc($desc, 25), LOG_DEBUG);
 
 		if ($this->status == self::STATUS_DRAFT) {
-
-			if (isModEnabled('subtotal')) {
-				if (in_array($special_code, ['811', '812'])) {
-					$this->addSubtotalLine();
-					return 1;
-				}
-			}
-
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 
 			// Clean parameters

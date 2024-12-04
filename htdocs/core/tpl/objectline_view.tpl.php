@@ -75,6 +75,10 @@ if (empty($object) || !is_object($object)) {
 @phan-var-force string $description
 ';
 
+// Handle subtotal line view
+if ($line->special_code == $this->getSpecialCode()) :
+include DOL_DOCUMENT_ROOT.'/core/tpl/subtotal_view.tpl.php';
+else :
 global $mysoc;
 global $forceall, $senderissupplier, $inputalsopricewithtax, $outputalsopricetotalwithtax;
 
@@ -601,3 +605,4 @@ if ($action == 'selectlines') { ?>
 print "</tr>\n";
 
 print "<!-- END PHP TEMPLATE objectline_view.tpl.php -->\n";
+endif;

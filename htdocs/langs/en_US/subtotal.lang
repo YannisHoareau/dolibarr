@@ -1,0 +1,6 @@
+# Dolibarr language file - Source file is en_US - subtotal
+Level=Level %s
+Title=Title
+Subtotal=Subtotal
+SubtotalTitleHelp=Title line for subtotal
+SubtotalStHelp=Subtotal line for subtotal

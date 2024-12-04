@@ -52,14 +52,14 @@ if (!$user->admin) {
 // Constant and translation of the module description
 $modules = array(
 	'PROPAL' => 'Propal',
-	'CUSTOMER_ORDER' => 'CustomerOrder',
-	'CUSTOMER_INVOICE' => 'CustomerInvoice',
+	'COMMANDE' => 'CustomerOrder',
+	'FACTURE' => 'CustomerInvoice',
 );
 // Conditions for the option to be offered
 $conditions = array(
 	'PROPAL' => (isModEnabled("propal")),
-	'CUSTOMER_ORDER' => (isModEnabled("commande")),
-	'CUSTOMER_INVOICE' => (isModEnabled("facture")),
+	'COMMANDE' => (isModEnabled("commande")),
+	'FACTURE' => (isModEnabled("facture")),
 );
 
 /*

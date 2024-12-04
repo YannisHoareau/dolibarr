@@ -1027,6 +1027,60 @@ if (empty($reshook)) {
 			$line->subprice = (float) $subprice;
 			$line->multicurrency_subprice = $multicurrency_subprice;
 		}
+	} elseif ($action == 'addline' && GETPOST('addsubtotalline', 'alpha') && $usercancreate) {
+		// Add a new subtotalline
+
+		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
+
+		// Handling adding line for subtotal module
+		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
+			$langs->load('subtotal');
+			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
+			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
+			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
+			// Insert line
+			$result = $object->addSubtotalLine($desc, $depth);
+
+			if ($result > 0) {
+				// TODO refresh pdf ?
+//				$ret = $object->fetch($object->id); // Reload to get new records
+//				$object->fetch_thirdparty();
+//
+//				if (!getDolGlobalString('MAIN_DISABLE_PDF_AUTOUPDATE')) {
+//					// Define output language
+//					$outputlangs = $langs;
+//					$newlang = GETPOST('lang_id', 'alpha');
+//					if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang)) {
+//						$newlang = $object->thirdparty->default_lang;
+//					}
+//					if (!empty($newlang)) {
+//						$outputlangs = new Translate("", $conf);
+//						$outputlangs->setDefaultLang($newlang);
+//					}
+//
+//					$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
+//				}
+
+				unset($_POST['prod_entry_mode']);
+				unset($_POST['subtotal_desc']);
+				unset($_POST['subtotal_depth']);
+				unset($_POST['addsubtotalline']);
+				unset($_POST['type']);
+				unset($_POST['idprod']);
+				unset($_POST['pbq']);
+
+				unset($_POST['date_start']);
+				unset($_POST['date_startday']);
+				unset($_POST['date_startmonth']);
+				unset($_POST['date_startyear']);
+				unset($_POST['date_end']);
+				unset($_POST['date_endday']);
+				unset($_POST['date_endmonth']);
+				unset($_POST['date_endyear']);
+			} else {
+				setEventMessages($object->error, $object->errors, 'errors');
+			}
+		}
 	} elseif ($action == 'addline' && !GETPOST('submitforalllines', 'alpha') && !GETPOST('submitforallmargins', 'alpha') && $usercancreate) {		// Add line
 		// Set if we used free entry or predefined product
 		$predef = '';
@@ -1393,12 +1447,6 @@ if (empty($reshook)) {
 				$pu_ht_devise = price2num($price_ht_devise, 'MU');
 				$pu_ttc_devise = price2num($price_ttc_devise, 'MU');
 
-				if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
-					$special_code = GETPOSTINT('special_code');
-				} else {
-					$special_code = 0;
-				}
-
 				if ($pu_ttc && !$pu_ht) {
 					$price_base_type = 'TTC';
 				}
@@ -1463,7 +1511,7 @@ if (empty($reshook)) {
 
 			if (!$error) {
 				// Insert line
-				$result = $object->addline($desc, $pu_ht, $qty, $tva_tx, $localtax1_tx, $localtax2_tx, $idprod, $remise_percent, $price_base_type, $pu_ttc, $info_bits, $type, min($rank, count($object->lines) + 1), $special_code, GETPOST('fk_parent_line'), $fournprice, $buyingprice, $label, $date_start, $date_end, $array_options, $fk_unit, '', 0, $pu_ht_devise);
+				$result = $object->addline($desc, $pu_ht, $qty, $tva_tx, $localtax1_tx, $localtax2_tx, $idprod, $remise_percent, $price_base_type, $pu_ttc, $info_bits, $type, min($rank, count($object->lines) + 1), 0, GETPOST('fk_parent_line'), $fournprice, $buyingprice, $label, $date_start, $date_end, $array_options, $fk_unit, '', 0, $pu_ht_devise);
 
 				if ($result > 0) {
 					$db->commit();

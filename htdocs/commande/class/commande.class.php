@@ -1608,14 +1608,6 @@ class Commande extends CommonOrder
 		dol_syslog(get_class($this).$logtext, LOG_DEBUG);
 
 		if ($this->statut == self::STATUS_DRAFT) {
-
-			if (isModEnabled('subtotal')) {
-				if (in_array($special_code, ['811', '812'])) {
-					$this->addSubtotalLine();
-					return 1;
-				}
-			}
-
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 
 			// Clean parameters

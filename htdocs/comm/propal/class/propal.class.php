@@ -661,48 +661,10 @@ class Propal extends CommonObject
 		$noupdateafterinsertline = 0
 	) {
 		global $mysoc, $conf, $langs;
-	// TODO : clean this when not needed anymore
-//		var_dump($desc,
-//			'$pu_ht', $pu_ht,
-//			'qty', $qty,
-//			$txtva,
-//			$txlocaltax1,
-//			$txlocaltax2,
-//			'$fk_product', $fk_product,
-//			$remise_percent,
-//			$price_base_type,
-//			$pu_ttc,
-//			$info_bits,
-//			'$type', $type,
-//			$rang,
-//			'$special_code', $special_code,
-//			$fk_parent_line,
-//			$fk_fournprice,
-//			$pa_ht,
-//			$label,
-//			$date_start,
-//			$date_end,
-//			$array_options,
-//			$fk_unit,
-//			$origin,
-//			$origin_id,
-//			$pu_ht_devise,
-//			$fk_remise_except,
-//			$noupdateafterinsertline);
-
-//		$this->addSubtotalLine();
 
 		dol_syslog(get_class($this)."::addline propalid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_except=$remise_percent, price_base_type=$price_base_type, pu_ttc=$pu_ttc, info_bits=$info_bits, type=$type, fk_remise_except=".$fk_remise_except);
 
 		if ($this->statut == self::STATUS_DRAFT) {
-
-			if (isModEnabled('subtotal')) {
-				if (in_array($special_code, ['811', '812'])) {
-					$this->addSubtotalLine();
-					return 1;
-				}
-			}
-
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 
 			// Clean parameters
