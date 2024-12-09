@@ -75,8 +75,8 @@ if (empty($object) || !is_object($object)) {
 @phan-var-force string $description
 ';
 
-// Handle subtotal line view
-if ($line->special_code == $this->getSpecialCode()) :
+// Handle subtotals line view
+if ($line->special_code == $this->getSubtotalSpecialCode()) :
 include DOL_DOCUMENT_ROOT.'/core/tpl/subtotal_view.tpl.php';
 else :
 global $mysoc;

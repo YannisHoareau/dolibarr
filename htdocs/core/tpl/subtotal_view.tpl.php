@@ -58,13 +58,10 @@
  * @var string $text
  * @var string $description
  */
-// Protection to avoid direct call of template
-if (empty($object) || !is_object($object)) {
-	print "Error, template page can't be called as URL";
-	exit(1);
-}
+
+print "<!-- BEGIN PHP TEMPLATE objectline_edit.tpl.php -->\n";
+
 ?>
-<!-- BEGIN PHP TEMPLATE subtotal_view.tpl.php -->
 <?php if ($line->qty > 0) { ?>
 	<tr id="row-<?php print $line->id?>" class="drag drop oddeven">
 		<td class="linecollabel" colspan="7"><?=str_repeat('&nbsp;', ($line->qty-1)*2);?><?= $line->desc ?></td>

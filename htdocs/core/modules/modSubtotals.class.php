@@ -23,19 +23,19 @@
  */
 
 /**
- * 	  \defgroup   subtotal 	Module subtotal
+ * 	  \defgroup   subtotals 	Module subtotals
  *    \brief      Module for leave/vacation management
  *
  *    \file       htdocs/core/modules/modsubtotal.class.php
- *    \ingroup    subtotal
- *    \brief      Description and activation file for the module subtotal
+ *    \ingroup    subtotals
+ *    \brief      Description and activation file for the module subtotals
  */
 include_once DOL_DOCUMENT_ROOT."/core/modules/DolibarrModules.class.php";
-;
+
 /**
- *		Description and activation class for module subtotal
+ *		Description and activation class for module subtotals
  */
-class modSubtotal extends DolibarrModules
+class modSubtotals extends DolibarrModules
 {
 	public const SPECIAL_CODE = 81;
 	/**
@@ -53,7 +53,7 @@ class modSubtotal extends DolibarrModules
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
 		$this->numero = self::SPECIAL_CODE;
 		// Key text used to identify module (for permissions, menus, etc...)
-		$this->rights_class = 'subtotal';
+		$this->rights_class = 'subtotals';
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
@@ -74,11 +74,11 @@ class modSubtotal extends DolibarrModules
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/mymodule/temp");
-		$this->dirs = array("/subtotal/temp");
+		$this->dirs = array("/subtotals/temp");
 		$r = 0;
 
 		// Config pages
-		$this->config_page_url = array("subtotal.php");
+		$this->config_page_url = array("subtotals.php");
 
 		// Dependencies
 		$this->hidden = false; // A condition to hide module
@@ -87,7 +87,7 @@ class modSubtotal extends DolibarrModules
 		$this->conflictwith = array(); // List of module class names as string this module is in conflict with
 		$this->phpmin = array(7, 0); // Minimum version of PHP required by module
 		$this->need_dolibarr_version = array(3, 0); // Minimum version of Dolibarr required by module
-		$this->langfiles = array("subtotal");
+		$this->langfiles = array("subtotals");
 
 		// Constants
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',0),

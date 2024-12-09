@@ -59,8 +59,8 @@ if (empty($object) || !is_object($object)) {
 @phan-var-force string $var
 ';
 
-// Handle subtotal line edit
-if ($line->special_code == $this->getSpecialCode()) :
+// Handle subtotals line edit
+if ($line->special_code == $this->getSubtotalSpecialCode()) :
 	include DOL_DOCUMENT_ROOT.'/core/tpl/subtotal_edit.tpl.php';
 else :
 

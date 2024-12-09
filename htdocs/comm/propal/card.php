@@ -1032,12 +1032,12 @@ if (empty($reshook)) {
 
 		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
 
-		// Handling adding line for subtotal module
-		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
-			$langs->load('subtotal');
+		// Handling adding line for subtotals module
+		if (in_array($prod_entry_mode, ['subtotals', 'title'])) {
+			$langs->load('subtotals');
 			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
 			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
-			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
+			$depth = $prod_entry_mode == 'subtotals' ? -$depth : $depth;
 			// Insert line
 			$result = $object->addSubtotalLine($desc, $depth);
 

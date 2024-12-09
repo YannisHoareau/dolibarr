@@ -193,8 +193,8 @@ if ($nolinesbefore) {
 	<td class="nobottom linecoldescription minwidth400imp">
 <?php
 		// Vérifie si le module Subtotal est activé
-		if (isModEnabled('subtotal') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($this->element))) {
-			$langs->load('subtotal');
+		if (isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($this->element))) {
+			$langs->load('subtotals');
 			$depth_array = array();
 			for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
 				$depth_array[$i + 1] = $langs->trans("Level", $i + 1);
