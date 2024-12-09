@@ -112,14 +112,25 @@ trait CommonSubtotal
 		// Add the line calling the right module
 		if ($current_module == 'facture') {
 			$result = $this->updateline(
-				$lineid, 	// ID of line to change
-				$desc,		// Description
-				0,			// Unit price
-				$depth,		// Quantity
-				0,			// Discount percentage
-				'',			// Date start
-				'',			// Date end
-				0,			// VAT rate
+				$lineid, 				// ID of line to change
+				$desc,					// Description
+				0,						// Unit price
+				$depth,					// Quantity
+				0,						// Discount percentage
+				'',						// Date start
+				'',						// Date end
+				0,						// VAT rate
+				0,						// Local tax 1
+				0,						// Local tax 2
+				'',						// Price base type
+				0, 						//info bits
+				self::$PRODUCT_TYPE,	//type
+				0,						// fk parent line
+				0,						// skip update total
+				null,					// fk fournprice
+				0,						// pa ht
+				'',						// label
+				self::$SPECIAL_CODE		// special code
 			);
 		} elseif ($current_module== 'propal') {
 			$result = $this->updateline(

@@ -62,6 +62,8 @@ $coldisplay = 0;
 
 	$prod_entry_mode = $line->qty < 0 ? 'subtotals' : 'title';
 
+	$level = abs($line->qty);
+
 	print '<input type="hidden" name="prod_entry_mode" value="'.$prod_entry_mode.'">';
 
 	$situationinvoicelinewithparent = 0;
@@ -90,12 +92,11 @@ $coldisplay = 0;
 		print '<input type="text" name="title_desc" id="title_name" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
-		print $form->selectarray('title_depth', $depth_array, 'title_depth');
+		print $form->selectarray('title_depth', $depth_array, $level);
 	} else {
 		print '<input type="text" readonly name="title_desc" id="title_name" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
-		print $form->selectarray('title_depth', $depth_array, 'title_depth');
 	}
 
 	?>

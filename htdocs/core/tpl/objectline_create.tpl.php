@@ -206,19 +206,19 @@ if ($nolinesbefore) {
 					<?php
 					print $form->textwithtooltip($langs->trans("Title"), $langs->trans("SubtotalTitleHelp"));
 					echo '<input type="text" name="title_desc" id="title_name" placeholder="'.$langs->trans("Name").'">';
-					print $form->selectarray('title_depth', $depth_array, 'title_depth');
+					print $form->selectarray('title_depth', $depth_array);
 					?>
 				</label>
 				<input type="submit" class="button button-edit reposition smallpaddingimp" value="<?php echo $langs->trans('Add'); ?>" name="addsubtotalline" id="addTitleline">
 			</div>
 
 			<div class="subtotal_option">
-				<input type="radio" class="subtotal" name="prod_entry_mode" id="subtotal_st" value="subtotal">
+				<input type="radio" class="subtotal" name="prod_entry_mode" id="subtotal_st" value="subtotals">
 				<label for="subtotal_st" id="subtotal_inputs">
 					<?php
 					print $form->textwithtooltip($langs->trans("Subtotal"), $langs->trans("SubtotalStHelp"));
 					echo '<input type="text" name="subtotal_desc" id="title_name" placeholder="'.$langs->trans("Name").'">';
-					print $form->selectarray('subtotal_depth', $depth_array, 'subtotal_depth');
+					print $form->selectarray('subtotal_depth', $depth_array);
 					?>
 				</label>
 				<input type="submit" class="button button-edit reposition smallpaddingimp" value="<?php echo $langs->trans('Add'); ?>" name="addsubtotalline" id="addSubtotalline">
