@@ -77,7 +77,11 @@ switch (abs($line->qty)) {
 		$color = '#ADD8E6';
 		break;
 }
+
+// Base colspan if there is no module activated to display line correctly
 $colspan = 5;
+
+// Handling colspan if margin module is enabled
 if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
 	if ($user->hasRight('margins', 'creer')) {
 		$colspan +=1;
@@ -89,21 +93,25 @@ if (!empty($object->element) && in_array($object->element, array('facture', 'fac
 		$colspan +=1;
 	}
 }
+
+// Handling colspan if MAIN_NO_INPUT_PRICE_WITH_TAX conf is enabled
 if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 	$colspan +=1;
 }
+
+// Handling colspan if PRODUCT_USE_UNITS conf is enabled
 if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	$colspan +=1;
 }
 echo '<tr id="row-<?php echo $line->id?>" class="drag drop" style="background:'.$color.'">';
 
+// Showing line number if conf is enabled
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 	echo '<td class="linecolnum center"><span class="opacitymedium">'.($i + 1).'</span></td>';
 }
 
-if ($line->qty > 0) {
-		$colspan+=1;?>
-		<td class="linecollabel" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
+if ($line->qty > 0) { ?>
+		<td class="linecollabel" colspan="<?= $colspan+1 ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 <?php } elseif ($line->qty < 0) { ?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', (-$line->qty-1)*2);?><?= $line->desc ?></td>
 		<td class="linecolamount nowrap right">
@@ -140,6 +148,6 @@ if ($num > 1 && $conf->browser->layout != 'phone' && ((property_exists($this, 's
 } else {
 	echo '<td '.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'></td>';
 }
+echo '</tr>';
+echo '<!-- END PHP TEMPLATE subtotal_view.tpl.php -->';
 ?>
-	</tr>
-<!-- END PHP TEMPLATE subtotal_view.tpl.php -->
