@@ -47,9 +47,13 @@
 
 print "<!-- BEGIN PHP TEMPLATE subtotal_edit.tpl.php -->\n";
 
-$coldisplay = 0;
+echo '<tr class="oddeven tredited">';
+
+if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
+	echo '<td class="linecolnum center">'.($i + 1).'</td>';
+}
 ?>
-<tr class="oddeven tredited">
+
 	<td class="linecoldesc minwidth250onall">
 	<div id="line_<?php echo $line->id; ?>"></div>
 

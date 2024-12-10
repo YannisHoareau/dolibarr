@@ -59,48 +59,80 @@
  * @var string $description
  */
 
-print "<!-- BEGIN PHP TEMPLATE objectline_edit.tpl.php -->\n";
+echo "<!-- BEGIN PHP TEMPLATE objectline_edit.tpl.php -->\n";
+switch (abs($line->qty)) {
+	case 1:
+		$color = '#6495ED';
+		break;
+	case 2:
+		$color = '#87CEFA';
+		break;
+	case 3:
+		$color = '#87CEEB';
+		break;
+	case 4:
+		$color = '#B0E0E6';
+		break;
+	case 5:
+		$color = '#ADD8E6';
+		break;
+}
+$colspan = 6;
+if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
+	if ($user->hasRight('margins', 'creer')) {
+		$colspan +=1;
+	}
+	if (getDolGlobalString('DISPLAY_MARGIN_RATES') && $user->hasRight('margins', 'liretous')) {
+		$colspan +=1;
+	}
+	if (getDolGlobalString('DISPLAY_MARK_RATES') && $user->hasRight('margins', 'liretous')) {
+		$colspan +=1;
+	}
+}
+echo '<tr id="row-<?php echo $line->id?>" class="drag drop" style="background:'.$color.'">';
 
-?>
-<?php if ($line->qty > 0) { ?>
-	<tr id="row-<?php print $line->id?>" class="drag drop oddeven">
-		<td class="linecollabel" colspan="7"><?=str_repeat('&nbsp;', ($line->qty-1)*2);?><?= $line->desc ?></td>
+if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
+	echo '<td class="linecolnum center"><span class="opacitymedium">'.($i + 1).'</span></td>';
+}
+
+if ($line->qty > 0) {
+		$colspan+=1;?>
+		<td class="linecollabel" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 <?php } elseif ($line->qty < 0) { ?>
-	<tr id="row-<?php print $line->id?>" class="drag drop oddeven">
-		<td class="linecollabel nowrap right" colspan="6"><?=str_repeat('&nbsp;', (-$line->qty-1)*2);?><?= $line->desc ?></td>
+		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', (-$line->qty-1)*2);?><?= $line->desc ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
-			print price($this->getSubtotalLineAmount($line));
+			echo price($this->getSubtotalLineAmount($line));
 			?>
 		</td>
 <?php }
 
 // Edit picto
-print '<td class="linecoledit center">';
-print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=editline&token='.newToken().'&lineid='.$line->id.'">'.img_edit().'</a>';
-print '</td>';
+echo '<td class="linecoledit center">';
+echo '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=editline&token='.newToken().'&lineid='.$line->id.'">'.img_edit().'</a>';
+echo '</td>';
 
 // Delete picto
-print '<td class="linecoldelete center">';
-print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=ask_deleteline&token='.newToken().'&lineid='.$line->id.'">'.img_delete().'</a>';
-print '</td>';
+echo '<td class="linecoldelete center">';
+echo '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=ask_deleteline&token='.newToken().'&lineid='.$line->id.'">'.img_delete().'</a>';
+echo '</td>';
 
 // Move up-down picto
 if ($num > 1 && $conf->browser->layout != 'phone' && ((property_exists($this, 'situation_counter') && $this->situation_counter == 1) || empty($this->situation_cycle_ref)) && empty($disablemove)) {
-	print '<td class="linecolmove tdlineupdown center">';
+	echo '<td class="linecolmove tdlineupdown center">';
 	if ($i > 0) {
-		print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=up&token='.newToken().'&rowid='.$line->id.'">';
-		print img_up('default', 0, 'imgupforline');
-		print '</a>';
+		echo '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=up&token='.newToken().'&rowid='.$line->id.'">';
+		echo img_up('default', 0, 'imgupforline');
+		echo '</a>';
 	}
 	if ($i < $num - 1) {
-		print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=down&token='.newToken().'&rowid='.$line->id.'">';
-		print img_down('default', 0, 'imgdownforline');
-		print '</a>';
+		echo '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=down&token='.newToken().'&rowid='.$line->id.'">';
+		echo img_down('default', 0, 'imgdownforline');
+		echo '</a>';
 	}
-	print '</td>';
+	echo '</td>';
 } else {
-	print '<td '.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'></td>';
+	echo '<td '.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'></td>';
 }
 ?>
 	</tr>
