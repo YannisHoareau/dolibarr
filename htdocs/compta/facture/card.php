@@ -2160,11 +2160,11 @@ if (empty($reshook)) {
 		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
 
 		// Handling adding line for subtotals module
-		if (in_array($prod_entry_mode, ['subtotals', 'title'])) {
+		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
 			$langs->load('subtotals');
 			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
 			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
-			$depth = $prod_entry_mode == 'subtotals' ? -$depth : $depth;
+			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
 			// Insert line
 			$result = $object->addSubtotalLine($desc, $depth);
 
@@ -2646,15 +2646,15 @@ if (empty($reshook)) {
 			}
 		}
 	} elseif ($action == 'updateline' && GETPOSTISSET("saveSubtotal") && $usercancreate && !GETPOST('cancel', 'alpha')) {
-		// Update an axisting subtotalline
+		// Update an existing subtotalline
 
-		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
+		$line_edit_mode = GETPOST('line_edit_mode', 'aZ09');
 
 		$langs->load('subtotals');
 		$lineid = GETPOSTINT('lineid');
-		$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
-		$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
-		$depth = $prod_entry_mode == 'subtotals' ? -$depth : $depth;
+		$desc = GETPOST('line_desc') ?? $langs->trans("Title");
+		$depth = GETPOSTINT('line_depth') ?? 1;
+		$depth = $line_edit_mode == 'subtotal' ? -$depth : $depth;
 		// Insert line
 		$result = $object->updateSubtotalLine($lineid, $desc, $depth);
 
@@ -2678,22 +2678,11 @@ if (empty($reshook)) {
 //					$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 //				}
 
-			unset($_POST['prod_entry_mode']);
-			unset($_POST['subtotal_desc']);
-			unset($_POST['subtotal_depth']);
-			unset($_POST['addsubtotalline']);
+			unset($_POST['line_edit_mode']);
+			unset($_POST['line_desc']);
+			unset($_POST['line_depth']);
+			unset($_POST['special_code']);
 			unset($_POST['type']);
-			unset($_POST['idprod']);
-			unset($_POST['pbq']);
-
-			unset($_POST['date_start']);
-			unset($_POST['date_startday']);
-			unset($_POST['date_startmonth']);
-			unset($_POST['date_startyear']);
-			unset($_POST['date_end']);
-			unset($_POST['date_endday']);
-			unset($_POST['date_endmonth']);
-			unset($_POST['date_endyear']);
 		} else {
 			setEventMessages($object->error, $object->errors, 'errors');
 		}

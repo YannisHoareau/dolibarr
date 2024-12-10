@@ -60,11 +60,11 @@ $coldisplay = 0;
 
 	<?php
 
-	$prod_entry_mode = $line->qty < 0 ? 'subtotals' : 'title';
+	$line_edit_mode = $line->qty < 0 ? 'subtotal' : 'title';
 
 	$level = abs($line->qty);
 
-	print '<input type="hidden" name="prod_entry_mode" value="'.$prod_entry_mode.'">';
+	print '<input type="hidden" name="line_edit_mode" value="'.$line_edit_mode.'">';
 
 	$situationinvoicelinewithparent = 0;
 	if ($line->fk_prev_id != null && in_array($object->element, array('facture', 'facturedet'))) {
@@ -89,12 +89,12 @@ $coldisplay = 0;
 	}
 
 	if (!$situationinvoicelinewithparent) {
-		print '<input type="text" name="title_desc" id="title_name" value="';
+		print '<input type="text" name="line_desc" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
-		print $form->selectarray('title_depth', $depth_array, $level);
+		print $form->selectarray('line_depth', $depth_array, $level);
 	} else {
-		print '<input type="text" readonly name="title_desc" id="title_name" value="';
+		print '<input type="text" readonly name="line_desc" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
 	}

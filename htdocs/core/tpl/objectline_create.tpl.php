@@ -213,7 +213,7 @@ if ($nolinesbefore) {
 			</div>
 
 			<div class="subtotal_option">
-				<input type="radio" class="subtotal" name="prod_entry_mode" id="subtotal_st" value="subtotals">
+				<input type="radio" class="subtotal" name="prod_entry_mode" id="subtotal_st" value="subtotal">
 				<label for="subtotal_st" id="subtotal_inputs">
 					<?php
 					print $form->textwithtooltip($langs->trans("Subtotal"), $langs->trans("SubtotalStHelp"));
