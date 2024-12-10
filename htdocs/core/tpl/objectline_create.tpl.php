@@ -538,7 +538,6 @@ if ($nolinesbefore) {
 				echo '<div id="attributes_box"></div>';
 			}
 		}
-
 		// Editor wysiwyg
 		require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 		$nbrows = ROWS_2;

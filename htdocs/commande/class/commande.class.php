@@ -1565,41 +1565,6 @@ class Commande extends CommonOrder
 		$ref_ext = '',
 		$noupdateafterinsertline = 0
 	) {
-		// TODO : clean this when not needed anymore
-//		var_dump(
-//			"nom ligne",
-//			$desc,
-//			$pu_ht,
-//			"num ligne",
-//			$qty,
-//			$txtva,
-//			$txlocaltax1,
-//			$txlocaltax2,
-//			$fk_product,
-//			$remise_percent,
-//			$info_bits,
-//			$fk_remise_except,
-//			$price_base_type,
-//			$pu_ttc,
-//			$date_start,
-//			$date_end,
-//			"Product type",
-//			$type,
-//			$rang,
-//			"Special code",
-//			$special_code,
-//			$fk_parent_line,
-//			$fk_fournprice,
-//			$pa_ht,
-//			$label,
-//			$array_options,
-//			$fk_unit,
-//			$origin,
-//			$origin_id,
-//			$pu_ht_devise,
-//			$ref_ext,
-//			$noupdateafterinsertline);
-//		exit();
 		global $mysoc, $conf, $langs, $user;
 
 		$logtext = "::addline commandeid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_percent=$remise_percent";
