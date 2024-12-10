@@ -77,7 +77,7 @@ switch (abs($line->qty)) {
 		$color = '#ADD8E6';
 		break;
 }
-$colspan = 6;
+$colspan = 5;
 if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
 	if ($user->hasRight('margins', 'creer')) {
 		$colspan +=1;
@@ -88,6 +88,12 @@ if (!empty($object->element) && in_array($object->element, array('facture', 'fac
 	if (getDolGlobalString('DISPLAY_MARK_RATES') && $user->hasRight('margins', 'liretous')) {
 		$colspan +=1;
 	}
+}
+if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
+	$colspan +=1;
+}
+if (getDolGlobalString('PRODUCT_USE_UNITS')) {
+	$colspan +=1;
 }
 echo '<tr id="row-<?php echo $line->id?>" class="drag drop" style="background:'.$color.'">';
 
