@@ -94,6 +94,11 @@ if (!empty($object->element) && in_array($object->element, array('facture', 'fac
 	}
 }
 
+// Handling colspan if multicurrency module is enabled
+if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
+	$colspan +=1;
+}
+
 // Handling colspan if MAIN_NO_INPUT_PRICE_WITH_TAX conf is enabled
 if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 	$colspan +=1;
@@ -111,7 +116,8 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 }
 
 if ($line->qty > 0) { ?>
-		<td class="linecollabel" colspan="<?= $colspan+1 ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
+		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
+		<td class="linecollabel" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 <?php } elseif ($line->qty < 0) { ?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', (-$line->qty-1)*2);?><?= $line->desc ?></td>
 		<td class="linecolamount nowrap right">
@@ -119,6 +125,13 @@ if ($line->qty > 0) { ?>
 			echo price($this->getSubtotalLineAmount($line));
 			?>
 		</td>
+		<?php
+		if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
+			echo '<td class="linecolamount nowrap right">';
+			echo price($this->getSubtotalLineMulticurrencyAmount($line));
+			echo '</td>';
+		}
+		?>
 <?php }
 
 // Edit picto

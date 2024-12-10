@@ -106,8 +106,10 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 	?>
 	</td>
 
-	<td class="center valignmiddle" colspan="">
+	<td class="center valignmiddle">
 		<input type="submit" class="reposition button buttongen marginbottomonly button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
+	</td>
+	<td class="center valignmiddle">
 		<input type="submit" class="reposition button buttongen marginbottomonly button-cancel" id="cancellinebutton" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>">
 	</td>
 </tr>

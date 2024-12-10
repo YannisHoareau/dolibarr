@@ -200,4 +200,26 @@ trait CommonSubtotal
 		}
 		return $final_amount;
 	}
+
+	/**
+	 * Return the multicurrency_total_ht of lines that are above the current line (excluded) and that are not a subtotal line
+	 * until a title line of the same level is found
+	 *
+	 * @param object	$line
+	 * @return int		$total_ht
+	 */
+	public function getSubtotalLineMulticurrencyAmount($line)
+	{
+		$final_amount = 0;
+		for ($i = $line->rang-1; $i > 0; $i--) {
+			if ($this->lines[$i-1]->special_code == self::$SPECIAL_CODE) {
+				if ($this->lines[$i-1]->qty <= $line->qty*-1) {
+					return $final_amount;
+				}
+			} else {
+				$final_amount += $this->lines[$i-1]->multicurrency_total_ht;
+			}
+		}
+		return $final_amount;
+	}
 }
