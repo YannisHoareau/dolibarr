@@ -52,9 +52,41 @@ echo '<tr class="oddeven tredited">';
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 	echo '<td class="linecolnum center">'.($i + 1).'</td>';
 }
+
+// Base colspan if there is no module activated to display line correctly
+$colspan = 7;
+
+// Handling colspan if margin module is enabled
+if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
+	if ($user->hasRight('margins', 'creer')) {
+		$colspan +=1;
+	}
+	if (getDolGlobalString('DISPLAY_MARGIN_RATES') && $user->hasRight('margins', 'liretous')) {
+		$colspan +=1;
+	}
+	if (getDolGlobalString('DISPLAY_MARK_RATES') && $user->hasRight('margins', 'liretous')) {
+		$colspan +=1;
+	}
+}
+
+// Handling colspan if multicurrency module is enabled
+if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
+	$colspan +=1;
+}
+
+// Handling colspan if MAIN_NO_INPUT_PRICE_WITH_TAX conf is enabled
+if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
+	$colspan +=1;
+}
+
+// Handling colspan if PRODUCT_USE_UNITS conf is enabled
+if (getDolGlobalString('PRODUCT_USE_UNITS')) {
+	$colspan +=1;
+}
+
 ?>
 
-	<td class="linecoldesc minwidth250onall">
+	<td class="linecoldesc minwidth250onall" colspan="<?= $colspan; ?>">
 	<div id="line_<?php echo $line->id; ?>"></div>
 
 	<input type="hidden" name="lineid" value="<?php echo $line->id; ?>">
@@ -93,7 +125,7 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 	}
 
 	if (!$situationinvoicelinewithparent) {
-		print '<input type="text" name="line_desc" id="line_desc" value="';
+		print '<input type="text" name="line_desc" class="marginrightonly" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
 		print $form->selectarray('line_depth', $depth_array, $level);
@@ -106,11 +138,9 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 	?>
 	</td>
 
-	<td class="center valignmiddle">
-		<input type="submit" class="reposition button buttongen marginbottomonly button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
-	</td>
-	<td class="center valignmiddle">
-		<input type="submit" class="reposition button buttongen marginbottomonly button-cancel" id="cancellinebutton" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>">
+	<td class="center valignmiddle" colspan="3">
+		<input type="submit" class="reposition button buttongen button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
+		<input type="submit" class="reposition button buttongen button-cancel" id="cancellinebutton" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>">
 	</td>
 </tr>
 
