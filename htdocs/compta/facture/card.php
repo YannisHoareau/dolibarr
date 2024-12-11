@@ -4729,8 +4729,10 @@ if ($action == 'create') {
 	}
 
 	// Subtotal line form
-	if ($action == 'add_line') {
-		$formconfirm = $object->printSubtotalForm($form, $langs);
+	if ($action == 'add_title_line') {
+		$formconfirm = $object->printSubtotalForm($form, $langs, 'title');
+	} elseif ($action == 'add_subtotal_line') {
+		$formconfirm = $object->printSubtotalForm($form, $langs, 'subtotal');
 	}
 
 	if ($action == "remove_file_comfirm") {
@@ -5944,7 +5946,20 @@ if ($action == 'create') {
 
 			// Subtotal
 			if ($object->status == Facture::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
-				print dolGetButtonAction($langs->trans('addtitle'), '', 'default', $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_line&token='.newToken(), '', true, $params);
+
+				// Array of the subbuttons
+				$url_button = array(
+					array(
+						'label' => $langs->trans('AddTitle'),
+						'perm' => true,
+						'urlraw' => $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_title_line&token='.newToken()
+					),
+					array(
+						'label' => $langs->trans('AddSubtotal'),
+						'perm' => true,
+						'urlraw' => $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_subtotal_line&token='.newToken()
+					),);
+				print dolGetButtonAction($langs->trans('AddSubtotalLineInfo'), $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true, $params);
 			}
 
 			// Validate

@@ -223,11 +223,9 @@ trait CommonSubtotal
 		return $final_amount;
 	}
 
-	public function printSubtotalForm($form, $langs)
+	public function printSubtotalForm($form, $langs, $type)
 	{
 		$langs->load('subtotals');
-
-		$type_array = array('title' => 'Title', 'subtotal' => 'Subtotal');
 
 		$depth_array = array();
 		for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
@@ -236,8 +234,8 @@ trait CommonSubtotal
 
 		// Create an array for form
 		$formquestion = array(
+			array('type' => 'hidden', 'name' => 'subtotallinetype', 'value' => $type),
 			array('type' => 'text', 'name' => 'subtotallinedesc', 'label' => $langs->trans("SubtotalLineDesc"), 'moreattr' => 'placeholder="'.$langs->trans("Description").'"'),
-			array('type' => 'select', 'name' => 'subtotallinetype', 'label' => $langs->trans("SubtotalLineType"), 'values' => $type_array, 'default' => 1, 'select_show_empty' => 0),
 			array('type' => 'select', 'name' => 'subtotallinelevel', 'label' => $langs->trans("SubtotalLineLevel"), 'values' => $depth_array, 'default' => 1, 'select_show_empty' => 0),
 		);
 
@@ -246,6 +244,8 @@ trait CommonSubtotal
 			$page .= '?facid='.$this->id;
 		}
 
-		return $form->formconfirm($page, $langs->trans('AddSubtotalLine'), '', 'confirm_add_line', $formquestion, 'yes', 1);
+		$form_title = $type == 'title' ? $langs->trans('AddTitleLine') : $langs->trans('AddSubtotalLine');
+
+		return $form->formconfirm($page, $form_title, '', 'confirm_add_line', $formquestion, 'yes', 1);
 	}
 }
