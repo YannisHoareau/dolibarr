@@ -223,6 +223,14 @@ trait CommonSubtotal
 		return $final_amount;
 	}
 
+	/**
+	 * Returns a form array to add a subtotal or title line
+	 *
+	 * @param Form $form
+	 * @param Translate $langs
+	 * @param string $type 'title' or 'subtotal'
+	 * @return string $formconfirm
+	 */
 	public function getSubtotalForm($form, $langs, $type)
 	{
 		$langs->load('subtotals');

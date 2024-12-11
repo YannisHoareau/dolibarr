@@ -31,6 +31,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doleditor.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 
 /**
  * @var Conf $conf
@@ -49,6 +50,11 @@ if (!$user->admin) {
 	accessforbidden();
 }
 
+$formother = new FormOther($db);
+
+// default color const
+$default = 'ffffff';
+
 // Constant and translation of the module description
 $modules = array(
 	'PROPAL' => 'Propal',
@@ -62,6 +68,19 @@ $conditions = array(
 	'FACTURE' => (isModEnabled("facture")),
 );
 
+$max_depth = 0;
+
+foreach ($modules as $const => $desc) {
+	$const_depth = getDolGlobalString('SUBTOTAL_'.$const.'_MAX_DEPTH');
+	$max_depth = max($const_depth, $max_depth);
+}
+
+$colors = array();
+
+for ($i = 0; $i < $max_depth; $i++) {
+	$colors['SUBTOTAL_BACK_COLOR_LEVEL_'.$i+1] = array('level' => $i+1, 'color' => getDolGlobalString('SUBTOTAL_BACK_COLOR_LEVEL_'.$i+1, $default));
+}
+
 /*
  *  Actions
  */
@@ -74,6 +93,18 @@ if (preg_match('/^SUBTOTAL_.*$/', $action)) {
 		$value == 0 ? $value = 1 : $value = 0;
 		dolibarr_set_const($db, $action, $value, 'chaine', 0, '', $conf->entity);
 	}
+}
+
+if ($action == 'update_colors') {
+	foreach ($colors as $const => $color) {
+		$color_to_update = GETPOST($const);
+		if ($color_to_update != $color['color']) {
+			dolibarr_set_const($db, $const, $color_to_update, 'chaine', 0, '', $conf->entity);
+		}
+	}
+
+	header("Location: ".$_SERVER["PHP_SELF"]);
+	exit;
 }
 
 
@@ -126,9 +157,9 @@ if (empty($conf->use_javascript_ajax)) {
 
 		print '<td class="center">';
 		$can_modify = !($value_subtotal == 0 && $value_title == 0);
-		print '<form action="'.$_SERVER["PHP_SELF"].'?action='.'SUBTOTAL_'.$const.'_MAX_DEPTH'.'" method="POST">';
+		print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" >';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
-		print '<input type="hidden" name="action" value="updateMask">';
+		print '<input type="hidden" name="action" value="SUBTOTAL_'.$const.'_MAX_DEPTH">';
 		print '<input size="3" type="text"';
 		print $can_modify ? '' : ' readonly ';
 		print 'name="SUBTOTAL_'.$const.'_MAX_DEPTH" value="'.getDolGlobalString('SUBTOTAL_'.$const.'_MAX_DEPTH', 2).'">';
@@ -142,33 +173,36 @@ if (empty($conf->use_javascript_ajax)) {
 	print '</table>';
 
 	// Other options
+
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="update_colors">';
+
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>'.$langs->trans("Other").'</td>';
 	print '<td></td>';
 	print "</tr>\n";
 
-	print '<tr class="oddeven">';
-	print '<td>';
-	print $langs->trans('TitleSubtotalPDFbackColor');
-	print '</td>';
-	print '<td class="center width100">';
-	print 'COLOR PICKER HERE';
-	print "</td>";
-	print '</tr>';
-
-	print '<tr class="oddeven">';
-	print '<td>';
-	print $langs->trans('CommentPDFbackColor ?');
-	print '</td>';
-	print '<td class="center width100">';
-	print 'COLOR PICKER HERE';
-	print "</td>";
-	print '</tr>';
+	foreach ($colors as $key => $value) {
+		print '<tr class="oddeven">';
+		print '<td>'.$langs->trans("SubtotalLineBackColor", $value['level']).'</td>';
+		print '<td>';
+		print $formother->selectColor(colorArrayToHex(colorStringToArray($value['color'], array()), $default), $key, '', 1, array(), '', '', $default).' ';
+		print ' &nbsp; <span class="nowraponall opacitymedium">'.$langs->trans("Default").'</span>: <strong>'.$default.'</strong>';
+		print $form->textwithpicto('', $langs->trans("NotSupportedByAllThemes").', '.$langs->trans("PressF5AfterChangingThis"));
+		print '</td>';
+		print '</tr>';
+	}
 
 	print '</table>'."\n";
 
 }
+
+print '<div class="center">';
+print '<input class="button button-save reposition buttonforacesave" type="submit" name="submit" value="' . $langs->trans("Save") . '">';
+print '<input class="button button-cancel reposition" type="submit" name="cancel" value="' . $langs->trans("Cancel") . '">';
+print '</div>';
 
 // End of page
 llxFooter();
