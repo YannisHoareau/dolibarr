@@ -258,4 +258,14 @@ trait CommonSubtotal
 
 		return $form->formconfirm($page, $form_title, '', 'confirm_add_line', $formquestion, 'yes', 1);
 	}
+
+	/**
+	 * Retrieve the background color associated with a specific subtotal level.
+	 *
+	 * @param int $level The level of the subtotal for which the color is requested.
+	 * @return string|null The background color in hexadecimal format or null if not set.
+	 */
+	public function getSubtotalColors($level) {
+		return getDolGlobalString('SUBTOTAL_BACK_COLOR_LEVEL_'.abs($level));
+	}
 }

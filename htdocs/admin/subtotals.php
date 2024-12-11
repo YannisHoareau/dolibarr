@@ -187,7 +187,7 @@ if (empty($conf->use_javascript_ajax)) {
 	foreach ($colors as $key => $value) {
 		print '<tr class="oddeven">';
 		print '<td>'.$langs->trans("SubtotalLineBackColor", $value['level']).'</td>';
-		print '<td>';
+		print '<td class="center width250">';
 		print $formother->selectColor(colorArrayToHex(colorStringToArray($value['color'], array()), $default), $key, '', 1, array(), '', '', $default).' ';
 		print ' &nbsp; <span class="nowraponall opacitymedium">'.$langs->trans("Default").'</span>: <strong>'.$default.'</strong>';
 		print $form->textwithpicto('', $langs->trans("NotSupportedByAllThemes").', '.$langs->trans("PressF5AfterChangingThis"));

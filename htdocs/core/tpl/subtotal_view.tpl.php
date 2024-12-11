@@ -59,24 +59,7 @@
  * @var string $description
  */
 
-echo "<!-- BEGIN PHP TEMPLATE objectline_edit.tpl.php -->\n";
-switch (abs($line->qty)) {
-	case 1:
-		$color = '#6495ED';
-		break;
-	case 2:
-		$color = '#87CEFA';
-		break;
-	case 3:
-		$color = '#87CEEB';
-		break;
-	case 4:
-		$color = '#B0E0E6';
-		break;
-	case 5:
-		$color = '#ADD8E6';
-		break;
-}
+echo "<!-- BEGIN PHP TEMPLATE subtotal_view.tpl.php -->\n";
 
 // Base colspan if there is no module activated to display line correctly
 $colspan = 5;
@@ -108,7 +91,7 @@ if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	$colspan +=1;
 }
-echo '<tr id="row-'.$line->id.'" class="drag drop" style="background:'.$color.'">';
+echo '<tr id="row-'.$line->id.'" class="drag drop" style="background:#'.$this->getSubtotalColors($line->qty).'">';
 
 // Showing line number if conf is enabled
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
