@@ -222,4 +222,30 @@ trait CommonSubtotal
 		}
 		return $final_amount;
 	}
+
+	public function printSubtotalForm($form, $langs)
+	{
+		$langs->load('subtotals');
+
+		$type_array = array('title' => 'Title', 'subtotal' => 'Subtotal');
+
+		$depth_array = array();
+		for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
+			$depth_array[$i + 1] = $langs->trans("Level", $i + 1);
+		}
+
+		// Create an array for form
+		$formquestion = array(
+			array('type' => 'text', 'name' => 'subtotallinedesc', 'label' => $langs->trans("SubtotalLineDesc"), 'moreattr' => 'placeholder="'.$langs->trans("Description").'"'),
+			array('type' => 'select', 'name' => 'subtotallinetype', 'label' => $langs->trans("SubtotalLineType"), 'values' => $type_array, 'default' => 1, 'select_show_empty' => 0),
+			array('type' => 'select', 'name' => 'subtotallinelevel', 'label' => $langs->trans("SubtotalLineLevel"), 'values' => $depth_array, 'default' => 1, 'select_show_empty' => 0),
+		);
+
+		$page = $_SERVER["PHP_SELF"];
+		if ($this->element == 'facture') {
+			$page .= '?facid='.$this->id;
+		}
+
+		return $form->formconfirm($page, $langs->trans('AddSubtotalLine'), '', 'confirm_add_line', $formquestion, 'yes', 1);
+	}
 }

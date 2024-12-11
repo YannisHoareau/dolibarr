@@ -2160,17 +2160,17 @@ if (empty($reshook)) {
 			}
 			$result = $object->updateline($line->id, $line->desc, $line->subprice, $line->qty, $remise_percent, $line->date_start, $line->date_end, $tvatx, $line->localtax1_tx, $line->localtax2_tx, 'HT', $line->info_bits, $line->product_type, $line->fk_parent_line, 0, $line->fk_fournprice, $line->pa_ht, $line->label, $line->special_code, $line->array_options, $line->situation_percent, $line->fk_unit, $line->multicurrency_subprice);
 		}
-	} elseif ($action == 'addline' && GETPOST('addsubtotalline', 'alpha') && $usercancreate) {
+	} elseif ($action == 'confirm_add_line' && $usercancreate) {
 		// Add a new subtotalline
 
-		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
+		$line_type = GETPOST('subtotallinetype', 'aZ09');
 
 		// Handling adding line for subtotals module
-		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
+		if (in_array($line_type, ['subtotal', 'title'])) {
 			$langs->load('subtotals');
-			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
-			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
-			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
+			$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
+			$depth = GETPOSTINT('subtotallinelevel') ?? 1;
+			$depth = $line_type == 'subtotal' ? -$depth : $depth;
 			// Insert line
 			$result = $object->addSubtotalLine($desc, $depth);
 
@@ -4728,6 +4728,11 @@ if ($action == 'create') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?facid='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneInvoice', $object->ref), 'confirm_clone', $formquestion, 'yes', 1, 250);
 	}
 
+	// Subtotal line form
+	if ($action == 'add_line') {
+		$formconfirm = $object->printSubtotalForm($form, $langs);
+	}
+
 	if ($action == "remove_file_comfirm") {
 		$file = GETPOST('file', 'alpha');
 
@@ -5935,6 +5940,11 @@ if ($action == 'create') {
 						print '<a class="butAction" href="' . DOL_URL_ROOT . '/contrat/card.php?action=create&amp;origin=' . $object->element . '&amp;originid=' . $object->id . '&amp;socid=' . $object->socid . '">' . $langs->trans('AddContract') . '</a>';
 					}
 				}
+			}
+
+			// Subtotal
+			if ($object->status == Facture::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
+				print dolGetButtonAction($langs->trans('addtitle'), '', 'default', $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_line&token='.newToken(), '', true, $params);
 			}
 
 			// Validate

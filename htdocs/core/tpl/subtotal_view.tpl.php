@@ -108,7 +108,7 @@ if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	$colspan +=1;
 }
-echo '<tr id="row-<?php echo $line->id?>" class="drag drop" style="background:'.$color.'">';
+echo '<tr id="row-'.$line->id.'" class="drag drop" style="background:'.$color.'">';
 
 // Showing line number if conf is enabled
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
@@ -119,7 +119,7 @@ if ($line->qty > 0) { ?>
 		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
 		<td class="linecollabel" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 <?php } elseif ($line->qty < 0) { ?>
-		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', (-$line->qty-1)*2);?><?= $line->desc ?></td>
+		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?= $line->desc ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
 			echo price($this->getSubtotalLineAmount($line));
