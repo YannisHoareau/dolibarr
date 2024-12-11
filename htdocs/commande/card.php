@@ -722,17 +722,17 @@ if (empty($reshook)) {
 			}
 			$result = $object->updateline($line->id, $line->desc, $line->subprice, $line->qty, $remise_percent, $tvatx, $line->localtax1_tx, $line->localtax2_tx, 'HT', $line->info_bits, $line->date_start, $line->date_end, $line->product_type, $line->fk_parent_line, 0, $line->fk_fournprice, $line->pa_ht, $line->label, $line->special_code, $line->array_options, $line->fk_unit, $line->multicurrency_subprice);
 		}
-	} elseif ($action == 'addline' && GETPOST('addsubtotalline', 'alpha') && $usercancreate) {
+	} elseif ($action == 'confirm_add_line' && $usercancreate) {
 		// Add a new subtotalline
 
-		$prod_entry_mode = GETPOST('prod_entry_mode', 'aZ09');
+		$line_type = GETPOST('subtotallinetype', 'aZ09');
 
 		// Handling adding line for subtotals module
-		if (in_array($prod_entry_mode, ['subtotal', 'title'])) {
+		if (in_array($line_type, ['subtotal', 'title'])) {
 			$langs->load('subtotals');
-			$desc = GETPOST($prod_entry_mode.'_desc') ?? $langs->trans("Title");
-			$depth = GETPOSTINT($prod_entry_mode.'_depth') ?? 1;
-			$depth = $prod_entry_mode == 'subtotal' ? -$depth : $depth;
+			$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
+			$depth = GETPOSTINT('subtotallinelevel') ?? 1;
+			$depth = $line_type == 'subtotal' ? -$depth : $depth;
 			// Insert line
 			$result = $object->addSubtotalLine($desc, $depth);
 
@@ -2644,6 +2644,13 @@ if ($action == 'create' && $usercancreate) {
 			$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneOrder', $object->ref), 'confirm_clone', $formquestion, 'yes', 1);
 		}
 
+		// Subtotal line form
+		if ($action == 'add_title_line') {
+			$formconfirm = $object->getSubtotalForm($form, $langs, 'title');
+		} elseif ($action == 'add_subtotal_line') {
+			$formconfirm = $object->getSubtotalForm($form, $langs, 'subtotal');
+		}
+
 		// Call Hook formConfirm
 		$parameters = array('formConfirm' => $formconfirm, 'lineid' => $lineid);
 		// Note that $action and $object may be modified by hook
@@ -3123,6 +3130,24 @@ if ($action == 'create' && $usercancreate) {
 							print dolGetButtonAction('', $langs->trans('SendMail'), 'email', $_SERVER['PHP_SELF']. '#', '', false);
 						}
 					}
+				}
+
+				// Subtotal
+				if ($object->status == Commande::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
+
+					// Array of the subbuttons
+					$url_button = array(
+						array(
+							'label' => $langs->trans('AddTitle'),
+							'perm' => true,
+							'urlraw' => $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=add_title_line&token='.newToken()
+						),
+						array(
+							'label' => $langs->trans('AddSubtotal'),
+							'perm' => true,
+							'urlraw' => $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=add_subtotal_line&token='.newToken()
+						),);
+					print dolGetButtonAction($langs->trans('AddSubtotalLineInfo'), $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true);
 				}
 
 				// Valid

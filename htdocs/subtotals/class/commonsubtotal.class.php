@@ -223,7 +223,7 @@ trait CommonSubtotal
 		return $final_amount;
 	}
 
-	public function printSubtotalForm($form, $langs, $type)
+	public function getSubtotalForm($form, $langs, $type)
 	{
 		$langs->load('subtotals');
 
@@ -242,6 +242,8 @@ trait CommonSubtotal
 		$page = $_SERVER["PHP_SELF"];
 		if ($this->element == 'facture') {
 			$page .= '?facid='.$this->id;
+		} elseif (in_array($this->element, array('propal', 'commande'))) {
+			$page .= '?id='.$this->id;
 		}
 
 		$form_title = $type == 'title' ? $langs->trans('AddTitleLine') : $langs->trans('AddSubtotalLine');

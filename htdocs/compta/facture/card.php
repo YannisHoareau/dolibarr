@@ -4730,9 +4730,9 @@ if ($action == 'create') {
 
 	// Subtotal line form
 	if ($action == 'add_title_line') {
-		$formconfirm = $object->printSubtotalForm($form, $langs, 'title');
+		$formconfirm = $object->getSubtotalForm($form, $langs, 'title');
 	} elseif ($action == 'add_subtotal_line') {
-		$formconfirm = $object->printSubtotalForm($form, $langs, 'subtotal');
+		$formconfirm = $object->getSubtotalForm($form, $langs, 'subtotal');
 	}
 
 	if ($action == "remove_file_comfirm") {
@@ -5959,7 +5959,7 @@ if ($action == 'create') {
 						'perm' => true,
 						'urlraw' => $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_subtotal_line&token='.newToken()
 					),);
-				print dolGetButtonAction($langs->trans('AddSubtotalLineInfo'), $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true, $params);
+				print dolGetButtonAction($langs->trans('AddSubtotalLineInfo'), $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true);
 			}
 
 			// Validate
