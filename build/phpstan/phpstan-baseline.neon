@@ -2653,12 +2653,6 @@ parameters:
 			path: ../../htdocs/blockedlog/class/blockedlog.class.php
 
 		-
-			message: '#^Variable \$aaa might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/blockedlog/class/blockedlog.class.php
-
-		-
 			message: '#^Property BOM\:\:\$status \(int\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
@@ -8197,12 +8191,6 @@ parameters:
 			path: ../../htdocs/core/actions_massactions.inc.php
 
 		-
-			message: '#^Variable \$action might not be defined\.$#'
-			identifier: variable.undefined
-			count: 14
-			path: ../../htdocs/core/actions_massactions.inc.php
-
-		-
 			message: '#^Variable \$from might not be defined\.$#'
 			identifier: variable.undefined
 			count: 5
@@ -8218,12 +8206,6 @@ parameters:
 			message: '#^Variable \$listofobjectthirdparties in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
-			path: ../../htdocs/core/actions_massactions.inc.php
-
-		-
-			message: '#^Variable \$month might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../../htdocs/core/actions_massactions.inc.php
 
 		-
@@ -8254,12 +8236,6 @@ parameters:
 			message: '#^Variable \$triggername in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
-			path: ../../htdocs/core/actions_massactions.inc.php
-
-		-
-			message: '#^Variable \$year might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
 			path: ../../htdocs/core/actions_massactions.inc.php
 
 		-
@@ -17395,18 +17371,6 @@ parameters:
 			path: ../../htdocs/cron/class/cronjob.class.php
 
 		-
-			message: '#^Variable \$ExecTimeLimit in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: ../../htdocs/cron/class/cronjob.class.php
-
-		-
-			message: '#^Variable \$MemoryLimit in empty\(\) always exists and is always falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: ../../htdocs/cron/class/cronjob.class.php
-
-		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 10
@@ -25411,36 +25375,6 @@ parameters:
 			path: ../../htdocs/product/class/product.class.php
 
 		-
-			message: '#^Property Product\:\:\$stats_bom has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../../htdocs/product/class/product.class.php
-
-		-
-			message: '#^Property Product\:\:\$stats_facture_fournisseur has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../../htdocs/product/class/product.class.php
-
-		-
-			message: '#^Property Product\:\:\$stats_facturerec has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../../htdocs/product/class/product.class.php
-
-		-
-			message: '#^Property Product\:\:\$stats_mrptoconsume has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../../htdocs/product/class/product.class.php
-
-		-
-			message: '#^Property Product\:\:\$stats_mrptoproduce has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../../htdocs/product/class/product.class.php
-
-		-
 			message: '#^Property Product\:\:\$status \(int\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
@@ -25468,12 +25402,6 @@ parameters:
 			message: '#^Ternary operator condition is always false\.$#'
 			identifier: ternary.alwaysFalse
 			count: 2
-			path: ../../htdocs/product/class/product.class.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
 			path: ../../htdocs/product/class/product.class.php
 
 		-
@@ -27817,12 +27745,6 @@ parameters:
 			path: ../../htdocs/projet/tasks.php
 
 		-
-			message: '#^Variable \$param might not be defined\.$#'
-			identifier: variable.undefined
-			count: 17
-			path: ../../htdocs/projet/tasks.php
-
-		-
 			message: '#^Variable \$permissiontodelete might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -28479,42 +28401,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$paymentAmount of function print_paypal_redirect expects float, string given\.$#'
 			identifier: argument.type
-			count: 1
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_KO might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_OK might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_PASSWORD might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_SANDBOX might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_SIGNATURE might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../htdocs/public/payment/newpayment.php
-
-		-
-			message: '#^Variable \$PAYPAL_API_USER might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../htdocs/public/payment/newpayment.php
 

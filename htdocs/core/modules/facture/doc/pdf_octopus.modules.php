@@ -1398,15 +1398,18 @@ class pdf_octopus extends ModelePDFFactures
 		}
 
 		// If France, show VAT mention if applicable
-		if ($this->emetteur->country_code == 'FR' && empty($object->total_tva) && (empty($mysoc->tva_assuj) || ($this->emetteur->isInEEC() && $object->thirdparty->isInEEC()))) {
-			$pdf->SetFont('', 'B', $default_font_size - 2);
+		if (in_array($this->emetteur->country_code, array('FR')) && empty($object->total_tva)) {
+			$pdf->SetFont('', '', $default_font_size - 2);
 			$pdf->SetXY($this->marge_gauche, $posy);
-			if ($mysoc->forme_juridique_code == 92) {
-				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATIsNotUsedForInvoiceAsso"), 0, 'L', 0);
-			} else {
-				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATIsNotUsedForInvoice"), 0, 'L', 0);
+			if (empty($mysoc->tva_assuj)) {
+				if ($mysoc->forme_juridique_code == 92) {
+					$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATIsNotUsedForInvoiceAsso"), 0, 'L', 0);
+				} else {
+					$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATIsNotUsedForInvoice"), 0, 'L', 0);
+				}
+			} elseif (getDolGlobalString("INVOICE_VAT_SHOW_REVERSE_CHARGE_MENTION") && $this->emetteur->country_code != $object->thirdparty->country_code && $this->emetteur->isInEEC() && $object->thirdparty->isInEEC()) {
+				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATIsNotUsedReverseChargeProcedure"), 0, 'L', 0);
 			}
-
 			$posy = $pdf->GetY() + 4;
 		}
 
