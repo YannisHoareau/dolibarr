@@ -190,15 +190,15 @@ trait CommonSubtotal
 	{
 		$final_amount = 0;
 		for ($i = $line->rang-1; $i > 0; $i--) {
-			if ($this->lines[$i-1]->special_code == self::$SPECIAL_CODE) {
-				if ($this->lines[$i-1]->qty <= $line->qty*-1) {
-					return $final_amount;
+			if ($this->lines[$i-1]->special_code == self::$SPECIAL_CODE && $this->lines[$i-1]->qty>0) {
+				if ($this->lines[$i-1]->qty <= abs($line->qty)) {
+					return price($final_amount);
 				}
 			} else {
 				$final_amount += $this->lines[$i-1]->total_ht;
 			}
 		}
-		return $final_amount;
+		return price($final_amount);
 	}
 
 	/**
@@ -212,15 +212,15 @@ trait CommonSubtotal
 	{
 		$final_amount = 0;
 		for ($i = $line->rang-1; $i > 0; $i--) {
-			if ($this->lines[$i-1]->special_code == self::$SPECIAL_CODE) {
-				if ($this->lines[$i-1]->qty <= $line->qty*-1) {
-					return $final_amount;
+			if ($this->lines[$i-1]->special_code == self::$SPECIAL_CODE && $this->lines[$i-1]->qty>0) {
+				if ($this->lines[$i-1]->qty <= abs($line->qty)) {
+					return price($final_amount);
 				}
 			} else {
 				$final_amount += $this->lines[$i-1]->multicurrency_total_ht;
 			}
 		}
-		return $final_amount;
+		return price($final_amount);
 	}
 
 	/**

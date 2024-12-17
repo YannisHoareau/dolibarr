@@ -3146,6 +3146,8 @@ if ($action == 'create' && $usercancreate) {
 				// Subtotal
 				if ($object->status == Commande::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
 
+					$langs->load('subtotals');
+
 					// Array of the subbuttons
 					$url_button = array(
 						array(

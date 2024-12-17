@@ -64,7 +64,7 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 }
 
 // Base colspan if there is no module activated to display line correctly
-$colspan = 7;
+$colspan = 5;
 
 // Handling colspan if margin module is enabled
 if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
@@ -155,7 +155,7 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	?>
 	</td>
 
-	<td class="center valignmiddle" colspan="3">
+	<td class="center valignmiddle" colspan="5">
 		<input type="submit" class="reposition button buttongen button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
 		<input type="submit" class="reposition button buttongen button-cancel" id="cancellinebutton" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>">
 	</td>

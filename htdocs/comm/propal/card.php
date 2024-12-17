@@ -3233,6 +3233,8 @@ if ($action == 'create') {
 				// Subtotal
 				if ($object->status == Propal::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
 
+					$langs->load('subtotals');
+
 					// Array of the subbuttons
 					$url_button = array(
 						array(
