@@ -45,6 +45,16 @@
  * @var User $user
  */
 
+// Options for subtotal //TODO : check if 'checked' is true or false
+$line_options = array(
+	'showuponpdf' => array('type' => array('title'), 'checked' => true, 'trans_key' => 'ShowUPOnPDF'),
+	'showtotalexludingvatonpdf' => array('type' => array('title', 'subtotal'), 'checked' => true, 'trans_key' => 'ShowTotalExludingVATOnPDF'),
+	'forcepagebreak' => array('type' => array('title'), 'checked' => true, 'trans_key' => 'ForcePageBreak'),
+);
+
+// Line type
+$line_type = $line->qty > 0 ? 'title' : 'subtotal';
+
 print "<!-- BEGIN PHP TEMPLATE subtotal_edit.tpl.php -->\n";
 
 echo '<tr class="oddeven tredited">';
@@ -129,12 +139,19 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
 		print $form->selectarray('line_depth', $depth_array, $level);
+		$selected = 0;
+		print '<div><ul class="ecmjqft">';
+		foreach ($line_options as $key => $value) {
+			if (in_array($line_type, $value['type'])) {
+				print '<li><input id="'.$key.'" type="checkbox" name="'.$key.'" value="" checked="'.$value['checked'].'">'.$langs->trans($value['trans_key']).'</input></li>';
+			}
+		}
+		print '</ul></div>';
 	} else {
 		print '<input type="text" readonly name="line_desc" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
 		print '">';
 	}
-
 	?>
 	</td>
 

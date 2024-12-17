@@ -163,7 +163,7 @@ if (empty($conf->use_javascript_ajax)) {
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 		print '<input type="hidden" name="action" value="SUBTOTAL_'.$const.'_MAX_DEPTH">';
 		print '<input size="3" type="text"';
-		print $can_modify ? '' : ' disabled="" ';
+		print $can_modify ? '' : ' disabled="disabled" ';
 		print 'name="SUBTOTAL_'.$const.'_MAX_DEPTH" value="'.getDolGlobalString('SUBTOTAL_'.$const.'_MAX_DEPTH', $can_modify ? 2 : 0).'">';
 		print $can_modify ? '<input type="submit" class="button button-edit reposition smallpaddingimp" name="Button"value="'.$langs->trans("Modify").'">' : '';
 		print '</form>';

@@ -16,7 +16,7 @@ if ($type == 'title') {
 		array('type' => 'hidden', 'name' => 'subtotallinetype', 'value' => $type),
 		array('type' => 'text', 'name' => 'subtotallinedesc', 'label' => $langs->trans("SubtotalLineDesc"), 'moreattr' => 'placeholder="'.$langs->trans("Description").'"'),
 		array('type' => 'select', 'name' => 'subtotallinelevel', 'label' => $langs->trans("SubtotalLineLevel"), 'values' => $depth_array, 'default' => 1, 'select_show_empty' => 0),
-		array('type' => 'checkbox', 'name' => 'showonpdf', 'label' => $langs->trans("ShowUPOnPDF")),
+		array('type' => 'checkbox', 'name' => 'showuponpdf', 'label' => $langs->trans("ShowUPOnPDF")),
 		array('type' => 'checkbox', 'name' => 'showtotalexludingvatonpdf', 'label' => $langs->trans("ShowTotalExludingVATOnPDF")),
 		array('type' => 'checkbox', 'name' => 'forcepagebreak', 'label' => $langs->trans("ForcePageBreak")),
 	);

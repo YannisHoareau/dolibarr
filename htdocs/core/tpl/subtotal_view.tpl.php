@@ -102,7 +102,7 @@ if ($line->qty > 0) { ?>
 		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
 		<td class="linecollabel" colspan="<?= $colspan ?>"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 <?php } elseif ($line->qty < 0) { ?>
-		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?= $line->desc ?></td>
+		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?= $line->desc.' :' ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
 			echo price($this->getSubtotalLineAmount($line));
