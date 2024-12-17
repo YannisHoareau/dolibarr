@@ -2168,9 +2168,20 @@ if (empty($reshook)) {
 		// Handling adding line for subtotals module
 		if (in_array($line_type, ['subtotal', 'title'])) {
 			$langs->load('subtotals');
-			$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
-			$depth = GETPOSTINT('subtotallinelevel') ?? 1;
-			$depth = $line_type == 'subtotal' ? -$depth : $depth;
+
+			if ($line_type == 'subtotal') {
+				$choosen_line = GETPOST('subtotaltitleline', 'aZ09');
+				foreach ($object->lines as $line) {
+					if ($line->id == $choosen_line) {
+						$desc = $line->desc;
+						$depth = -$line->qty;
+					}
+				}
+			} else {
+				$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
+				$depth = GETPOSTINT('subtotallinelevel') ?? 1;
+			}
+
 			// Insert line
 			$result = $object->addSubtotalLine($desc, $depth);
 

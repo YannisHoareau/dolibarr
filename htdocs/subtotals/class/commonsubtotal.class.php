@@ -238,7 +238,7 @@ trait CommonSubtotal
 
 			foreach ($this->lines as $line) {
 				if ($line->special_code == self::$SPECIAL_CODE && $line->qty > 0) {
-					$titles[$line->desc] = $line->desc;
+					$titles[$line->id] = $line->desc;
 				}
 			}
 		}
