@@ -3149,12 +3149,12 @@ if ($action == 'create' && $usercancreate) {
 					// Array of the subbuttons
 					$url_button = array(
 						array(
-							'label' => $langs->trans('AddTitle'),
+							'label' => $langs->trans('Title'),
 							'perm' => true,
 							'urlraw' => $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=add_title_line&token='.newToken()
 						),
 						array(
-							'label' => $langs->trans('AddSubtotal'),
+							'label' => $langs->trans('Subtotal'),
 							'perm' => true,
 							'urlraw' => $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=add_subtotal_line&token='.newToken()
 						),);
