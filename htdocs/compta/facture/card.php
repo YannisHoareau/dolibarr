@@ -5947,19 +5947,21 @@ if ($action == 'create') {
 			// Subtotal
 			if ($object->status == Facture::STATUS_DRAFT && isModEnabled('subtotals') && getDolGlobalString('SUBTOTAL_TITLE_'.strtoupper($object->element))) {
 
+				$langs->load("subtotals");
+
 				// Array of the subbuttons
 				$url_button = array(
 					array(
-						'label' => $langs->trans('AddTitle'),
+						'label' => $langs->trans('Title'),
 						'perm' => true,
 						'urlraw' => $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_title_line&token='.newToken()
 					),
 					array(
-						'label' => $langs->trans('AddSubtotal'),
+						'label' => $langs->trans('Subtotal'),
 						'perm' => true,
 						'urlraw' => $_SERVER["PHP_SELF"].'?facid='.$object->id.'&action=add_subtotal_line&token='.newToken()
-					),);
-				print dolGetButtonAction($langs->trans('AddSubtotalLineInfo'), $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true);
+					));
+				print dolGetButtonAction('', $langs->trans('AddSubtotalLine'), 'default', $url_button, '', true);
 			}
 
 			// Validate

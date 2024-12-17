@@ -233,6 +233,16 @@ trait CommonSubtotal
 	 */
 	public function getSubtotalForm($form, $langs, $type)
 	{
+		if ($type == 'subtotal') {
+			$titles = array();
+
+			foreach ($this->lines as $line) {
+				if ($line->special_code == self::$SPECIAL_CODE && $line->qty > 0) {
+					$titles[$line->desc] = $line->desc;
+				}
+			}
+		}
+
 		$tpl = dol_buildpath('/core/tpl/subtotal_create.tpl.php');
 
 		if (empty($conf->file->strict_mode)) {

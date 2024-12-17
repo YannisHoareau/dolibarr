@@ -1,6 +1,26 @@
 # Dolibarr language file - Source file is en_US - subtotal
-Level=Level %s
+
+#
+# Global
+#
 Title=Title
 Subtotal=Subtotal
-SubtotalTitleHelp=Title line for subtotal
-SubtotalStHelp=Subtotal line for subtotal
+
+#
+# Admin
+#
+SubtotalSetup=Subtotals module setup
+MaxSubtotalLevel=Maximum level
+SubtotalLineBackColor=Level %s lines background color
+
+#
+# Card
+#
+AddTitleLine=Add title line
+AddSubtotalLine=Add subtotal line
+Level=Level %s
+SubtotalLineDesc=Line description
+SubtotalLineLevel=Line level
+ShowUPOnPDF=Show unit price on PDF
+ShowTotalExludingVATOnPDF=Show the total excluding VAT on the PDF
+ForcePageBreak=Force page break before title

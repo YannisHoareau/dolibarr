@@ -43,7 +43,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
  */
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'subtotals', 'errors'));
+$langs->loadLangs(array('main', 'admin', 'subtotals', 'errors'));
 $action = GETPOST('action', 'aZ09');
 
 if (!$user->admin) {
@@ -57,9 +57,9 @@ $default = 'ffffff';
 
 // Constant and translation of the module description
 $modules = array(
-	'PROPAL' => 'Propal',
-	'COMMANDE' => 'CustomerOrder',
-	'FACTURE' => 'CustomerInvoice',
+	'PROPAL' => array('lang' => 'propal', 'key' => 'Proposal'),
+	'COMMANDE' => array('lang' => 'orders', 'key' => 'CustomerOrder'),
+	'FACTURE' => array('lang' => 'bills', 'key' => 'CustomerInvoice'),
 );
 // Conditions for the option to be offered
 $conditions = array(
@@ -123,10 +123,10 @@ if (empty($conf->use_javascript_ajax)) {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	#TODO translations
-	print '<td width="1100">'.$langs->trans("ActivateSubtotal").'</td>';
+	print '<td width="1100">'.$langs->trans("Settings").'</td>';
 	print '<td class="center">'.$langs->trans("Title").'</td>';
 	print '<td class="center">'.$langs->trans("Subtotal").'</td>';
-	print '<td class="center">'.$langs->trans("MaxDepthLevel").'</td>';
+	print '<td class="center">'.$langs->trans("MaxSubtotalLevel").'</td>';
 	#print '<td>'.$langs->trans("Comment").'</td>'; #TODO : comment ?
 	print "</tr>\n";
 
@@ -137,11 +137,13 @@ if (empty($conf->use_javascript_ajax)) {
 			continue;
 		}
 
+		$langs->load($desc['lang']);
+
 		$constante_title = 'SUBTOTAL_TITLE_'.$const;
 		$constante_subtotal = 'SUBTOTAL_'.$const;
 		print '<!-- constant = '.$constante_subtotal.' -->'."\n";
 		print '<tr class="oddeven">';
-		print '<td>'.$langs->trans($desc).'</td>';
+		print '<td>'.$langs->trans($desc['key']).'</td>';
 
 		print '<td class="center">';
 		$value_title = getDolGlobalInt($constante_title, 0);
