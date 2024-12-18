@@ -633,6 +633,11 @@ class pdf_cyan extends ModelePDFPropales
 							$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
 							$this->setAfterColsLinePositionsData('desc', $pdf->GetY(), $pdf->getPage());
 						} else {
+							if (($curY + 6) > ($this->page_hauteur - $heightforfooter)) {
+								$pdf->AddPage();
+								$pdf->setPage($pdf->getNumPages());
+								$curY = $tab_top_newpage;
+							}
 							$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
 							$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
 							$pdf->SetXY($pdf->GetX() + 1, $curY + 1);
