@@ -24,6 +24,7 @@ ShowUPOnPDF=Show unit price on PDF
 ShowTotalExludingVATOnPDF=Show the total excluding VAT on the PDF
 ForcePageBreak=Force page break before title
 NoTitleSet=You should set at least one title before adding any subtotal line
+CorrespondingSubtotalLine=Corresponding subtotal line
 
 #
 # PDF
