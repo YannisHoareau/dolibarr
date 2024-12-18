@@ -65,11 +65,11 @@ if (empty($user->id)) {
 	print "Load permissions for admin user nb 1\n";
 	$user->fetch(1);
 	$user->loadRights();
-
-	if (empty($user->rights->website)) {
-		$user->rights->website = new stdClass();
-	}
 }
+if (empty($user->rights->website)) {
+	$user->rights->website = new stdClass();
+}
+
 $conf->global->MAIN_DISABLE_ALL_MAILS = 1;
 
 
@@ -139,6 +139,18 @@ class WebsiteTest extends CommonClassTest
 
 		$t = '';
 		$s = '<?php exec("eee"); ?>';
+		$result = checkPHPCode($t, $s);
+		print __METHOD__." result checkPHPCode=".$result."\n";
+		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');
+
+		$t = '';
+		$s = '<?php eXec  ("eee"); ?>';
+		$result = checkPHPCode($t, $s);
+		print __METHOD__." result checkPHPCode=".$result."\n";
+		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');
+
+		$t = '';
+		$s = '<?php $a="xec"; "e$a" ("ee"); ?>';
 		$result = checkPHPCode($t, $s);
 		print __METHOD__." result checkPHPCode=".$result."\n";
 		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');

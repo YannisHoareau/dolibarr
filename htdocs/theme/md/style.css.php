@@ -1863,13 +1863,16 @@ select.flat.selectlimit {
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.twolinesmax {
+.twolinesmax, .twolinesmax-normallineheight {				/* To be used into a <div class="twolinesmax-normallineheight minwidth200onall"> into a td for example */
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 	height: auto !important;
 	word-break: break-word;
+}
+.twolinesmax-normallineheight {
+	line-height: normal;
 }
 .tenlinesmax {
 	display: -webkit-box;
@@ -4515,7 +4518,7 @@ table.liste th, table.noborder th, table.noborder tr.liste_titre td, table.nobor
 
 table.liste td, table.noborder td, div.noborder form div, table.tableforservicepart1 td, table.tableforservicepart2 td {
 	padding: 4px 8px 4px 10px;			/* t r b l */
-	height: 22px;
+	height: 28px;
 }
 table.liste tr.trkanban td {
 	padding: 12px 15px 12px 15px;			/* t r b l */

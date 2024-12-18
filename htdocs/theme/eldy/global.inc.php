@@ -1712,13 +1712,16 @@ select.flat.selectlimit {
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 }
-.twolinesmax {
+.twolinesmax, .twolinesmax-normallineheight {				/* To be used into a <div class="twolinesmax-normallineheight minwidth200onall"> into a td for example */
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	overflow: hidden;
 	height: auto !important;
 	word-break: break-word;
+}
+.twolinesmax-normallineheight {
+	line-height: normal;
 }
 .tenlinesmax {
 	display: -webkit-box;
@@ -4481,8 +4484,8 @@ table.tableforfield td, .tagtr.table-border-row .tagtd {
 }
 table.liste td, table.noborder td, div.noborder form div, table.tableforservicepart1 td, table.tableforservicepart2 td {
 	padding: 6px 10px 6px 12px;			/* t r b l */
-	/* line-height: 22px; This create trouble on cell login on list of last events of a contract*/
-	height: 30px;
+	/* line-height: 22px; This create trouble on cell login on list of last events of a contract */
+	height: 32px;
 }
 table.liste tr.trkanban td {
 	padding: 12px 15px 12px 15px;			/* t r b l */
