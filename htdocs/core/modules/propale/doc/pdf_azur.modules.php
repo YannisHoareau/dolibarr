@@ -527,14 +527,18 @@ class pdf_azur extends ModelePDFPropales
 					$curX = $this->posxdesc - 1;
 
 					$pdf->startTransaction();
-					if ($object->lines[$i]->special_code == self::$SPECIAL_CODE && $object->lines[$i]->qty < 0) {
+					if ($object->lines[$i]->special_code == self::$SPECIAL_CODE) {
 						$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
 						$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
-						$pdf->SetXY($curX + 1, $curY); //-2 to take into account  the entire height of the row
-						$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 0, '', 0, '', 1); //+2 same of SetXY()
-						$langs->load("subtotals");
-						$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
-						pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc, 0, 'R');
+						$pdf->SetXY($curX + 1, $curY);
+						$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 0, '', 0, '', 1);
+						$align = '';
+						if ($object->lines[$i]->qty < 0) {
+							$langs->load("subtotals");
+							$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
+							$align = 'R';
+						}
+						pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc, 0, $align);
 					} else {
 						pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc);
 					}

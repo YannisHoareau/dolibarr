@@ -38,6 +38,8 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/subtotals/class/commonsubtotal.class.php';
+
 
 
 /**
@@ -45,6 +47,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
  */
 class pdf_cyan extends ModelePDFPropales
 {
+
+	use CommonSubtotal;
+
 	/**
 	 * @var DoliDB Database handler
 	 */
@@ -624,8 +629,23 @@ class pdf_cyan extends ModelePDFPropales
 					$pdf->setPageOrientation('', 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 
 					if ($this->getColumnStatus('desc')) {
-						$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
-						$this->setAfterColsLinePositionsData('desc', $pdf->GetY(), $pdf->getPage());
+						if ($object->lines[$i]->special_code != self::$SPECIAL_CODE) {
+							$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
+							$this->setAfterColsLinePositionsData('desc', $pdf->GetY(), $pdf->getPage());
+						} else {
+							$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
+							$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
+							$pdf->SetXY($pdf->GetX() + 1, $curY + 1);
+							$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 5, '', 0, '', 1);
+							if ($object->lines[$i]->qty < 0) {
+								$langs->load("subtotals");
+								$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
+								$this->cols['desc']['content']['align'] = 'R';
+							}
+							$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
+							$this->setAfterColsLinePositionsData('desc', $pdf->GetY(), $pdf->getPage());
+							$this->cols['desc']['content']['align'] = 'L'; // Re align if we printed a subtotal ligne
+						}
 					}
 
 					$afterPosData = $this->getMaxAfterColsLinePositionsData();
@@ -650,41 +670,52 @@ class pdf_cyan extends ModelePDFPropales
 					}
 
 					// VAT Rate
-					if ($this->getColumnStatus('vat')) {
+					if ($this->getColumnStatus('vat')  && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'vat', $vat_rate);
 					}
 
 					// Unit price before discount
-					if ($this->getColumnStatus('subprice')) {
+					if ($this->getColumnStatus('subprice') && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
 						$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
 					}
 
 					// Quantity
 					// Enough for 6 chars
-					if ($this->getColumnStatus('qty')) {
+					if ($this->getColumnStatus('qty') && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
 						$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'qty', $qty);
 					}
 
 
 					// Unit
-					if ($this->getColumnStatus('unit')) {
+					if ($this->getColumnStatus('unit') && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
 						$unit = pdf_getlineunit($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'unit', $unit);
 					}
 
 					// Discount on line
-					if ($this->getColumnStatus('discount') && $object->lines[$i]->remise_percent) {
+					if ($this->getColumnStatus('discount' && $object->lines[$i]->special_code != self::$SPECIAL_CODE) && $object->lines[$i]->remise_percent) {
 						$remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'discount', $remise_percent);
 					}
 
 					// Total excl tax line (HT)
 					if ($this->getColumnStatus('totalexcltax')) {
-						$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
-						$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
+						if ($object->lines[$i]->special_code != self::$SPECIAL_CODE) {
+							$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+							$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
+						} else {
+							if ($object->lines[$i]->qty < 0) {
+								if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
+									$total_excl_tax = $object->getSubtotalLineMulticurrencyAmount($object->lines[$i]);
+								} else {
+									$total_excl_tax = $object->getSubtotalLineAmount($object->lines[$i]);
+								}
+								$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
+							}
+						}
 					}
 
 					// Total with tax line (TTC)
