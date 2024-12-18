@@ -105,13 +105,13 @@ if ($line->qty > 0) { ?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan ?>"><?= $line->desc.' :' ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
-			echo price($this->getSubtotalLineAmount($line));
+			echo $this->getSubtotalLineAmount($line);
 			?>
 		</td>
 		<?php
 		if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
 			echo '<td class="linecolamount nowrap right">';
-			echo price($this->getSubtotalLineMulticurrencyAmount($line));
+			echo $this->getSubtotalLineMulticurrencyAmount($line);
 			echo '</td>';
 		}
 		?>
