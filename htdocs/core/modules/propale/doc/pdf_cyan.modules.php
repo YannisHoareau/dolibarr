@@ -670,7 +670,7 @@ class pdf_cyan extends ModelePDFPropales
 					}
 
 					// VAT Rate
-					if ($this->getColumnStatus('vat')  && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
+					if ($this->getColumnStatus('vat') && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
 						$this->printStdColumnContent($pdf, $curY, 'vat', $vat_rate);
 					}
