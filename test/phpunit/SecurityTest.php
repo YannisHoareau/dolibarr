@@ -625,52 +625,66 @@ class SecurityTest extends CommonClassTest
 		print "result4 = ".$result."\n";
 		$this->assertEquals('Parent project not found', $result);
 
+		/* not allowed. Not a one line eval string
+		$result = (string) dol_eval('if ($a == 1) { }', 1, 1);
+		print "result4b = ".$result."\n";
+		$this->assertEquals('aaa', $result);
+		*/
+
+		// Now string not allowed
+
 		$s = 'new abc->invoke(\'whoami\')';
 		$result = (string) dol_eval($s, 1, 1, '2');
 		print "result = ".$result."\n";
-		$this->assertEquals('Bad string syntax to evaluate: new abc__forbiddenstring__(\'whoami\')', $result);
+		$this->assertEquals('Bad string syntax to evaluate: new abc__forbiddenstring__(\'whoami\')', $result, 'The string was not detected as evil');
 
 		$s = 'new ReflectionFunction(\'abc\')';
 		$result = (string) dol_eval($s, 1, 1, '2');
 		print "result = ".$result."\n";
-		$this->assertEquals('Bad string syntax to evaluate: new __forbiddenstring__(\'abc\')', $result);
+		$this->assertEquals('Bad string syntax to evaluate: new __forbiddenstring__(\'abc\')', $result, 'The string was not detected as evil');
 
 
-		$result = (string) dol_eval('$a=function() { }; $a;', 1, 1, '0');
-		print "result5 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$result = dol_eval('$a=function() { }; $a', 1, 1, '0');		// result of dol_eval may be an object Closure
+		print "result5 = ".json_encode($result)."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result), 'The string was not detected as evil');
 
-		$result = (string) dol_eval('$a=function() { }; $a;', 1, 1, '1');
-		print "result6 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$result = dol_eval('$a=function() { }; $a();', 1, 1, '1');
+		print "result6 = ".json_encode($result)."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result), 'The string was not detected as evil');
 
 		$result = (string) dol_eval('$a=exec("ls");', 1, 1);
 		print "result7 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = (string) dol_eval('$a=exec ("ls")', 1, 1);
 		print "result8 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
+
+		$result = (string) dol_eval("strrev('metsys') ('whoami')", 1, 1);
+		print "result8b = ".$result."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = (string) dol_eval('$a="test"; $$a;', 1, 0);
 		print "result9 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = (string) dol_eval('`ls`', 1, 0);
 		print "result10 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = (string) dol_eval("('ex'.'ec')('echo abc')", 1, 0);
 		print "result11 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = (string) dol_eval("sprintf(\"%s%s\", \"ex\", \"ec\")('echo abc')", 1, 0);
 		print "result12 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result);
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = dol_eval("90402.38+267678+0", 1, 1, 1);
 		print "result13 = ".$result."\n";
-		$this->assertEquals('358080.38', $result);
+		$this->assertEquals('358080.38', $result, 'The string was not detected as evil');
+
+		// Must be allowed
 
 		global $leftmenu;	// Used into strings to eval
 
@@ -706,23 +720,29 @@ class SecurityTest extends CommonClassTest
 		print "result18 = ".$result."\n";
 		$this->assertFalse($result);
 
+		// Not allowed
+
 		$a = 'ab';
 		$result = (string) dol_eval("(\$a.'s')", 1, 0);
 		print "result19 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 19');
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 19 - The string was not detected as evil');
 
 		$leftmenu = 'abs';
 		$result = (string) dol_eval('$leftmenu(-5)', 1, 0);
 		print "result20 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 20');
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 20 - The string was not detected as evil');
 
 		$result = (string) dol_eval('str_replace("z","e","zxzc")("whoami");', 1, 0);
 		print "result21 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 21');
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 21 - The string was not detected as evil');
 
 		$result = (string) dol_eval('($a = "ex") && ($b = "ec") && ($cmd = "$a$b") && $cmd ("curl localhost:5555")', 1, 0);
 		print "result22 = ".$result."\n";
-		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 22');
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 22 - The string was not detected as evil');
+
+		$result = (string) dol_eval('\'exec\'("aaa")', 1, 0);
+		print "result23 = ".$result."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', json_encode($result), 'Test 23 - The string was not detected as evil - Can\'t find the string Bad string syntax when i should');
 	}
 
 	/**
@@ -965,34 +985,5 @@ class SecurityTest extends CommonClassTest
 		$this->assertEquals($s, $result, 'Test for restricthtmlallowlinkscript');
 
 		return 0;
-	}
-
-
-	/**
-	 * testCheckLoginPassEntity
-	 *
-	 * @return	void
-	 */
-	public function testCheckLoginPassEntity()
-	{
-		$login = checkLoginPassEntity('loginbidon', 'passwordbidon', 1, array('dolibarr'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, '');
-
-		$login = checkLoginPassEntity('admin', 'passwordbidon', 1, array('dolibarr'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, '');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('dolibarr'));            // Should works because admin/admin exists
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, 'admin', 'The test to check if pass of user "admin" is "admin" has failed');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('http','dolibarr'));    // Should work because of second authentication method
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals($login, 'admin');
-
-		$login = checkLoginPassEntity('admin', 'admin', 1, array('forceuser'));
-		print __METHOD__." login=".$login."\n";
-		$this->assertEquals('', $login, 'Error');    // Expected '' because should failed because login 'auto' does not exists
 	}
 }

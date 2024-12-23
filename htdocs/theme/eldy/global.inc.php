@@ -748,8 +748,12 @@ input:-webkit-autofill {
 
 /* CSS for placeholder */
 .placeholder { color: #ccc; }
+select.placeholder { color: #ccc; }
 ::-webkit-input-placeholder { color: #ccc; }
 input:-moz-placeholder { color: #ccc; }
+select.placeholder option:not(.opacitymediumbycolor):not(.opacitymedium) {
+	color: var(--colortext);
+}
 
 input[name=price], input[name=weight], input[name=volume], input[name=surface], input[name=sizeheight], input[name=net_measure], select[name=incoterm_id] { margin-right: 6px; }
 fieldset {
@@ -765,6 +769,7 @@ fieldset {
 input#onlinepaymenturl, input#directdownloadlink {
 	opacity: 0.7;
 }
+
 
 .formconsumeproduce {
 	background: #f3f3f3;

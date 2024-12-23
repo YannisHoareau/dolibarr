@@ -132,10 +132,21 @@ class WebsiteTest extends CommonClassTest
 	 */
 	public function testCheckPHPCode()
 	{
-		global $user;
+		global $conf, $user;
 
 		// Force permission so this is not the permission that will affect result of checkPHPCode
 		$user->rights->website->writephp = 1;
+
+		// Legitimate
+
+		$t = '';
+		$s = '<?php execu ?>';
+		$result = checkPHPCode($t, $s);
+		print __METHOD__." result checkPHPCode=".$result."\n";
+		$this->assertEquals($result, 0, 'checkPHPCode detect string as dangerous when it is legitimate');
+
+
+		// Dangerous
 
 		$t = '';
 		$s = '<?php exec("eee"); ?>';
@@ -156,10 +167,26 @@ class WebsiteTest extends CommonClassTest
 		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');
 
 		$t = '';
+		$s = '<?php $a=\'exec\'("ee"); ?>';
+		$result = checkPHPCode($t, $s);
+		print __METHOD__." result checkPHPCode=".$result."\n";
+		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');
+
+		$t = '';
 		$s = '<?php $_="{"; $_=($_^"<").($_^">;").($_^"/"); ?><?=${\'_\'.$_}["_"](${\'_\'.$_}["__"]);?>';
 		$result = checkPHPCode($t, $s);
 		print __METHOD__." result checkPHPCode=".$result."\n";
 		$this->assertEquals($result, 1, 'checkPHPCode did not detect the string was dangerous');
+
+		// Dangerous but legitimate due to option WEBSITE_PHP_ALLOW_EXEC
+
+		$conf->global->WEBSITE_PHP_ALLOW_EXEC = 1;
+
+		$t = '';
+		$s = '<?php exec("eee"); ?>';
+		$result = checkPHPCode($t, $s);
+		print __METHOD__." result checkPHPCode=".$result."\n";
+		$this->assertEquals($result, 0, 'checkPHPCode did not accept the exec. it should when WEBSITE_PHP_ALLOW_EXEC is set.');
 	}
 
 	/**
