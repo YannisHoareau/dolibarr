@@ -2180,10 +2180,12 @@ if (empty($reshook)) {
 			} else {
 				$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
 				$depth = GETPOSTINT('subtotallinelevel') ?? 1;
+				$vatrate = GETPOSTINT('subtotalvatrate') ?? 0;
+				$remisepercent = GETPOSTINT('subtotalremisepercent') ?? 0;
 			}
 
 			// Insert line
-			$result = $object->addSubtotalLine($desc, $depth);
+			$result = $object->addSubtotalLine($desc, $depth, $vatrate, $remisepercent);
 
 			if ($result > 0) {
 				// TODO refresh pdf ?
@@ -4741,9 +4743,9 @@ if ($action == 'create') {
 
 	// Subtotal line form
 	if ($action == 'add_title_line') {
-		$formconfirm = $object->getSubtotalForm($form, $langs, 'title');
+		$formconfirm = $object->getSubtotalForm($form, $langs, 'title', $soc);
 	} elseif ($action == 'add_subtotal_line') {
-		$formconfirm = $object->getSubtotalForm($form, $langs, 'subtotal');
+		$formconfirm = $object->getSubtotalForm($form, $langs, 'subtotal', $soc);
 	}
 
 	if ($action == "remove_file_comfirm") {

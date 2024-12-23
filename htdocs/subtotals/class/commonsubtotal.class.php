@@ -23,7 +23,7 @@ trait CommonSubtotal
 	/**
 	 * Adds a subtotal or a title line to a document
 	 */
-	public function addSubtotalLine($desc, $depth)
+	public function addSubtotalLine($desc, $depth, $vatrate = 0, $remisepercent = 0)
 	{
 		$current_module = $this->element;
 		// Ensure the object is one of the supported types
@@ -38,11 +38,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// VAT rate
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				0,						// Discount percentage
+				$remisepercent,			// Discount percentage
 				'',						// Date start
 				'',						// Date end
 				0,						// FK code ventilation
@@ -59,11 +59,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// VAT rate
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				0,						// Discount percentage
+				$remisepercent,			// Discount percentage
 				'',						// Price base type
 				0,						// PU ttc
 				0,						// Info bits
@@ -76,11 +76,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// VAT rate
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				0,						// Discount percentage
+				$remisepercent,			// Discount percentage
 				0,						// Info bits
 				0,						// FK remise except
 				'',						// Price base type
@@ -231,7 +231,7 @@ trait CommonSubtotal
 	 * @param string $type 'title' or 'subtotal'
 	 * @return string $formconfirm
 	 */
-	public function getSubtotalForm($form, $langs, $type)
+	public function getSubtotalForm($form, $langs, $type, $seller)
 	{
 		if ($type == 'subtotal') {
 			$titles = array();

@@ -64,7 +64,7 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 }
 
 // Base colspan if there is no module activated to display line correctly
-$colspan = 5;
+$colspan = 3;
 
 // Handling colspan if margin module is enabled
 if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
@@ -96,7 +96,7 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 
 ?>
 
-	<td class="linecoldesc minwidth250onall" colspan="<?= $colspan; ?>">
+	<td class="linecoldesc minwidth250onall">
 	<div id="line_<?php echo $line->id; ?>"></div>
 
 	<input type="hidden" name="lineid" value="<?php echo $line->id; ?>">
@@ -146,14 +146,24 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 				print '<li><input id="'.$key.'" type="checkbox" name="'.$key.'" value="" checked="'.$value['checked'].'">'.$langs->trans($value['trans_key']).'</input></li>';
 			}
 		}
-		print '</ul></div>';
+		print '</ul></div></td>';
+
+		if ($line->qty > 0) {
+			print '<td class="right">';
+			print $form->load_tva('tva_tx', GETPOSTISSET('tva_tx') ? GETPOST('tva_tx', 'alpha') : ($line->tva_tx . ($line->vat_src_code ? (' (' . $line->vat_src_code . ')') : '')), $seller, $buyer, 0, $line->info_bits, $line->product_type, false, 1, $type_tva);
+			print '</td>';
+			print '<input type="text" class="flat right width40" name="remise_percent" id="remise_percent" value="'.(GETPOSTISSET('remise_percent') ? GETPOST('remise_percent') : ($line->remise_percent ?? '')).'"><span class="hideonsmartphone opacitymedium">%</span>';
+		} else {
+			$colspan += 2;
+		}
 	} else {
 		print '<input type="text" readonly name="line_desc" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
-		print '">';
+		print '"></td>';
 	}
 	?>
-	</td>
+
+	<td colspan="<?= $colspan ?>"></td>
 
 	<td class="center valignmiddle" colspan="5">
 		<input type="submit" class="reposition button buttongen button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
