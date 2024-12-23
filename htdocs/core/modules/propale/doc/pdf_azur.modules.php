@@ -40,8 +40,6 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/subtotals/class/commonsubtotal.class.php';
-
 
 
 /**
@@ -49,9 +47,6 @@ require_once DOL_DOCUMENT_ROOT.'/subtotals/class/commonsubtotal.class.php';
  */
 class pdf_azur extends ModelePDFPropales
 {
-
-	use CommonSubtotal;
-
 	/**
 	 * @var DoliDB Database handler
 	 */
@@ -527,21 +522,7 @@ class pdf_azur extends ModelePDFPropales
 					$curX = $this->posxdesc - 1;
 
 					$pdf->startTransaction();
-					if ($object->lines[$i]->special_code == self::$SPECIAL_CODE) {
-						$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
-						$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
-						$pdf->SetXY($curX + 1, $curY);
-						$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 0, '', 0, '', 1);
-						$align = '';
-						if ($object->lines[$i]->qty < 0) {
-							$langs->load("subtotals");
-							$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
-							$align = 'R';
-						}
-						pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc, 0, $align);
-					} else {
-						pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc);
-					}
+					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc);
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) {	// There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -595,25 +576,21 @@ class pdf_azur extends ModelePDFPropales
 					$pdf->SetFont('', '', $default_font_size - 1); // On repositionne la police par default
 
 					// VAT Rate
-					if (!getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT') && !getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN') && $object->lines[$i]->special_code != self::$SPECIAL_CODE) {
+					if (!getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT') && !getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN')) {
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
 						$pdf->SetXY($this->posxtva - 5, $curY);
 						$pdf->MultiCell($this->posxup - $this->posxtva + 4, 3, $vat_rate, 0, 'R');
 					}
 
 					// Unit price before discount
-					if ($object->lines[$i]->special_code != self::$SPECIAL_CODE) {
-						$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
-						$pdf->SetXY($this->posxup, $curY);
-						$pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 3, $up_excl_tax, 0, 'R', 0);
-					}
+					$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
+					$pdf->SetXY($this->posxup, $curY);
+					$pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 3, $up_excl_tax, 0, 'R', 0);
 
 					// Quantity
-					if ($object->lines[$i]->special_code != self::$SPECIAL_CODE) {
-						$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
-						$pdf->SetXY($this->posxqty, $curY);
-						$pdf->MultiCell($this->posxunit - $this->posxqty - 0.8, 4, $qty, 0, 'R'); // Enough for 6 chars
-					}
+					$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
+					$pdf->SetXY($this->posxqty, $curY);
+					$pdf->MultiCell($this->posxunit - $this->posxqty - 0.8, 4, $qty, 0, 'R'); // Enough for 6 chars
 
 					// Unit
 					if (getDolGlobalInt('PRODUCT_USE_UNITS')) {
@@ -631,21 +608,9 @@ class pdf_azur extends ModelePDFPropales
 					}
 
 					// Total HT line
-					if ($object->lines[$i]->special_code != self::$SPECIAL_CODE) {
-						$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
-						$pdf->SetXY($this->postotalht, $curY);
-						$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 3, $total_excl_tax, 0, 'R', 0);
-					} else {
-						if ($object->lines[$i]->qty < 0) {
-							if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
-								$total_excl_tax = $object->getSubtotalLineMulticurrencyAmount($object->lines[$i]);
-							} else {
-								$total_excl_tax = $object->getSubtotalLineAmount($object->lines[$i]);
-							}
-							$pdf->SetXY($this->postotalht, $curY);
-							$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 3, $total_excl_tax, 0, 'R', 0);
-						}
-					}
+					$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+					$pdf->SetXY($this->postotalht, $curY);
+					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 3, $total_excl_tax, 0, 'R', 0);
 
 					// Collecte des totaux par valeur de tva dans $this->tva["taux"]=total_tva
 					if (isModEnabled("multicurrency") && $object->multicurrency_tx != 1) {
