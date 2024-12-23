@@ -57,9 +57,9 @@ $default = 'ffffff';
 
 // Constant and translation of the module description
 $modules = array(
-	'PROPAL' => array('lang' => 'propal', 'key' => 'Proposal'),
-	'COMMANDE' => array('lang' => 'orders', 'key' => 'CustomerOrder'),
-	'FACTURE' => array('lang' => 'bills', 'key' => 'CustomerInvoice'),
+	'PROPAL' => array('lang' => 'propal', 'key' => 'Proposal', 'old_pdf' => '(azur model)'),
+	'COMMANDE' => array('lang' => 'orders', 'key' => 'CustomerOrder', 'old_pdf' => '(einstein model)'),
+	'FACTURE' => array('lang' => 'bills', 'key' => 'CustomerInvoice', 'old_pdf' => '(crabe model)'),
 );
 // Conditions for the option to be offered
 $conditions = array(
@@ -143,7 +143,7 @@ if (empty($conf->use_javascript_ajax)) {
 		$constante_subtotal = 'SUBTOTAL_'.$const;
 		print '<!-- constant = '.$constante_subtotal.' -->'."\n";
 		print '<tr class="oddeven">';
-		print '<td>'.$langs->trans($desc['key']).'</td>';
+		print '<td>'.$form->textwithpicto($langs->trans($desc['key']), $langs->trans("NotSupportedByAllPDF", $desc['old_pdf'])).'</td>';
 
 		print '<td class="center">';
 		$value_title = getDolGlobalInt($constante_title, 0);

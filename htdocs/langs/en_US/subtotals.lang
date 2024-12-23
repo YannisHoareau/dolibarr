@@ -11,6 +11,7 @@ Subtotal=Subtotal
 SubtotalSetup=Subtotals module setup
 MaxSubtotalLevel=Maximum level
 SubtotalLineBackColor=Level %s lines background color
+NotSupportedByAllPDF=Will work with newer PDF but not with old ones %s
 
 #
 # Card
