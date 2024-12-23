@@ -101,9 +101,16 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 if ($line->qty > 0) { ?>
 		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
 	<td class="linecollabel"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
-	<td class="inecolvat nowrap right"><?= $line->tva_tx != 0 ? vatrate($line->tva_tx, true) : '' ?></td>
+	<td class="inecolvat nowrap right">
+		<?= $line->tva_tx != 0 ? vatrate($line->tva_tx, true) : '' ?>
+		<input type="submit" class="buttongen" id="applyvatforblock" name="applyVATForBlock" value="<?php echo $langs->trans("Apply"); ?>"><br>
+	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 2 ?>"></td>
-	<td class="linecoldiscount right"><?= $line->remise_percent != 0 ? dol_print_reduction((float) $line->remise_percent, $langs) : '' ?></td>
+	<td class="linecoldiscount right">
+		<?= $line->remise_percent != 0 ? dol_print_reduction((float) $line->remise_percent, $langs) : '' ?>
+<!--		<input type="submit" class="buttongen" id="applydiscountforblock" name="applyDiscountForBlock" value="--><?php //echo $langs->trans("Apply"); ?><!--">-->
+		<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=editline&token='.newToken().'&lineid='.$line->id ?>"><?=img_action("test", 5)?></a>
+	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 4 ?>"></td>
 <?php } elseif ($line->qty < 0) { ?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan + 2 ?>"><?= $line->desc.' :' ?></td>

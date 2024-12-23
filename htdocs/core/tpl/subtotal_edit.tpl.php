@@ -152,7 +152,9 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 			print '<td class="right">';
 			print $form->load_tva('tva_tx', GETPOSTISSET('tva_tx') ? GETPOST('tva_tx', 'alpha') : ($line->tva_tx . ($line->vat_src_code ? (' (' . $line->vat_src_code . ')') : '')), $seller, $buyer, 0, $line->info_bits, $line->product_type, false, 1, $type_tva);
 			print '</td>';
-			print '<input type="text" class="flat right width40" name="remise_percent" id="remise_percent" value="'.(GETPOSTISSET('remise_percent') ? GETPOST('remise_percent') : ($line->remise_percent ?? '')).'"><span class="hideonsmartphone opacitymedium">%</span>';
+			print '<td colspan="'.($colspan - 1).'"></td>';
+			print '<td class="nowraponall right linecoldiscount"><input type="text" class="flat right width40" name="remise_percent" id="remise_percent" value="'.(GETPOSTISSET('remise_percent') ? GETPOST('remise_percent') : ($line->remise_percent ?? '')).'"><span class="hideonsmartphone opacitymedium">%</span></td>';
+			print '<td colspan="'.($colspan - 4).'"></td>';
 		} else {
 			$colspan += 2;
 		}
@@ -163,7 +165,6 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	}
 	?>
 
-	<td colspan="<?= $colspan ?>"></td>
 
 	<td class="center valignmiddle" colspan="5">
 		<input type="submit" class="reposition button buttongen button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
