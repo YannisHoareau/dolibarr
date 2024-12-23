@@ -623,7 +623,13 @@ class SecurityTest extends CommonClassTest
 		$s = '(($reloadedobj = new Task($db)) && ($reloadedobj->fetchNoCompute($object->id) > 0) && ($secondloadedobj = new Project($db)) && ($secondloadedobj->fetchNoCompute($reloadedobj->fk_project) > 0)) ? $secondloadedobj->ref : \'Parent project not found\'';
 		$result = (string) dol_eval($s, 1, 1, '2');
 		print "result4 = ".$result."\n";
-		$this->assertEquals('Parent project not found', $result);
+		$this->assertEquals('Parent project not found', $result, 'Test 4');
+
+		$s = '4 < 5';
+		$result = (string) dol_eval($s, 1, 1, '2');
+		print "result5 = ".$result."\n";
+		$this->assertEquals('1', $result, 'Test 5');
+
 
 		/* not allowed. Not a one line eval string
 		$result = (string) dol_eval('if ($a == 1) { }', 1, 1);
@@ -633,16 +639,25 @@ class SecurityTest extends CommonClassTest
 
 		// Now string not allowed
 
+		$s = '4 <5';
+		$result = (string) dol_eval($s, 1, 1, '2');		// in mode 2, char < is allowed only if followed by a space
+		print "result = ".$result."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 4 <5 - The string was not detected as evil');
+
+		$s = '4 < 5';
+		$result = (string) dol_eval($s, 1, 1, '1');		// in mode 1, char < is always forbidden
+		print "result = ".$result."\n";
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'Test 4 < 5 - The string was not detected as evil');
+
 		$s = 'new abc->invoke(\'whoami\')';
 		$result = (string) dol_eval($s, 1, 1, '2');
 		print "result = ".$result."\n";
-		$this->assertEquals('Bad string syntax to evaluate: new abc__forbiddenstring__(\'whoami\')', $result, 'The string was not detected as evil');
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$s = 'new ReflectionFunction(\'abc\')';
 		$result = (string) dol_eval($s, 1, 1, '2');
 		print "result = ".$result."\n";
-		$this->assertEquals('Bad string syntax to evaluate: new __forbiddenstring__(\'abc\')', $result, 'The string was not detected as evil');
-
+		$this->assertStringContainsString('Bad string syntax to evaluate', $result, 'The string was not detected as evil');
 
 		$result = dol_eval('$a=function() { }; $a', 1, 1, '0');		// result of dol_eval may be an object Closure
 		print "result5 = ".json_encode($result)."\n";
