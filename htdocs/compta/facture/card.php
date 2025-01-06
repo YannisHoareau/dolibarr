@@ -2674,8 +2674,10 @@ if (empty($reshook)) {
 		$desc = GETPOST('line_desc') ?? $langs->trans("Title");
 		$depth = GETPOSTINT('line_depth') ?? 1;
 		$depth = $line_edit_mode == 'subtotal' ? -$depth : $depth;
+		$vatrate = GETPOSTINT('tva_tx') ?? 0;
+		$remisepercent = GETPOSTINT('remise_percent') ?? 0;
 		// Insert line
-		$result = $object->updateSubtotalLine($lineid, $desc, $depth);
+		$result = $object->updateSubtotalLine($lineid, $desc, $depth, $vatrate, $remisepercent);
 
 		if ($result > 0) {
 			// TODO refresh pdf ?

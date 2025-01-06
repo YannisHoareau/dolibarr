@@ -99,7 +99,7 @@ trait CommonSubtotal
 	/**
 	 * Updates a subtotals line to a document
 	 */
-	public function updateSubtotalLine($lineid, $desc, $depth)
+	public function updateSubtotalLine($lineid, $desc, $depth, $vatrate = 0, $remisepercent = 0)
 	{
 
 		$current_module = $this->element;
@@ -116,10 +116,10 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// Discount percentage
+				$remisepercent,			// Discount percentage
 				'',						// Date start
 				'',						// Date end
-				0,						// VAT rate
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				'',						// Price base type
@@ -137,8 +137,8 @@ trait CommonSubtotal
 				$lineid, 				// ID of line to change
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// Discount percentage
-				0,						// VAT rate
+				$remisepercent,			// Discount percentage
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				$desc,					// Description
@@ -158,8 +158,8 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				0,						// Discount percentage
-				0,						// VAT rate
+				$remisepercent,			// Discount percentage
+				$vatrate,				// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				'',						// Price base type
