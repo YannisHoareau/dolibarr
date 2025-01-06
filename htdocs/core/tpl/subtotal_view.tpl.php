@@ -61,6 +61,8 @@
 
 echo "<!-- BEGIN PHP TEMPLATE subtotal_view.tpl.php -->\n";
 
+$langs->load('subtotals');
+
 // Base colspan if there is no module activated to display line correctly
 $colspan = 3;
 
@@ -102,14 +104,17 @@ if ($line->qty > 0) { ?>
 		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
 	<td class="linecollabel"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
 	<td class="inecolvat nowrap right">
-		<?= $line->tva_tx != 0 ? vatrate($line->tva_tx, true) : '' ?>
-		<input type="submit" class="buttongen" id="applyvatforblock" name="applyVATForBlock" value="<?php echo $langs->trans("Apply"); ?>"><br>
+		<?php if($line->tva_tx != 0):?>
+			<?= vatrate($line->tva_tx, true)?>
+			<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=applyvatforblock&token='.newToken().'&lineid='.$line->id ?>"><?=img_picto($langs->trans("ApplyVATForBlock"), 'category')?></a>
+		<?php endif;?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 2 ?>"></td>
 	<td class="linecoldiscount right">
-		<?= $line->remise_percent != 0 ? dol_print_reduction((float) $line->remise_percent, $langs) : '' ?>
-<!--		<input type="submit" class="buttongen" id="applydiscountforblock" name="applyDiscountForBlock" value="--><?php //echo $langs->trans("Apply"); ?><!--">-->
-		<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=editline&token='.newToken().'&lineid='.$line->id ?>"><?=img_action("test", 5)?></a>
+		<?php if($line->remise_percent != 0):?>
+			<?=dol_print_reduction((float) $line->remise_percent, $langs)?>
+			<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=applydiscountforblock&token='.newToken().'&lineid='.$line->id ?>"><?=img_picto($langs->trans("ApplyDiscountForBlock"), 'category')?></a>
+		<?php endif;?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 4 ?>"></td>
 <?php } elseif ($line->qty < 0) { ?>
