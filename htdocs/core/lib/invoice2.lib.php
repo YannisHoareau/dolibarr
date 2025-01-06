@@ -231,6 +231,7 @@ function rebuild_merge_pdf($db, $langs, $conf, $diroutputpdf, $newlangid, $filte
 			while ($cpt < $num) {
 				$obj = $db->fetch_object($resql);
 
+				$fac = null;
 				if ($mode == 'invoice') {
 					$fac = new Facture($db);
 				} elseif ($mode == 'order') {
