@@ -180,6 +180,98 @@ trait CommonSubtotal
 	}
 
 	/**
+	 * Updates a block of subtotals line of a document
+	 */
+	public function updateSubtotalLineBlockLines($linerang, $mode)
+	{
+
+		$linerang -= 1;
+		$remise_percent = $this->lines[$linerang]->remise_percent;
+		$tvatx = $this->lines[$linerang]->tva_tx;
+
+		for ($i = $linerang+1; $i < count($this->lines)+1; $i++) {
+			if ($this->lines[$i]->special_code == self::$SPECIAL_CODE) {
+				if (abs($this->lines[$i]->qty) <= (int)$this->lines[$linerang]->qty) {
+					return 1;
+				}
+			} else {
+				if ($this->element == 'facture') {
+					$result = $this->updateline(
+						$this->lines[$i]->id,
+						$this->lines[$i]->desc,
+						$this->lines[$i]->subprice,
+						$this->lines[$i]->qty,
+						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
+						$this->lines[$i]->date_start,
+						$this->lines[$i]->date_end,
+						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$this->lines[$i]->localtax1_tx,
+						$this->lines[$i]->localtax2_tx,
+						'HT',
+						$this->lines[$i]->info_bits,
+						$this->lines[$i]->product_type,
+						$this->lines[$i]->fk_parent_line, 0,
+						$this->lines[$i]->fk_fournprice,
+						$this->lines[$i]->pa_ht,
+						$this->lines[$i]->label,
+						$this->lines[$i]->special_code,
+						$this->lines[$i]->array_options,
+						$this->lines[$i]->situation_percent,
+						$this->lines[$i]->fk_unit,
+						$this->lines[$i]->multicurrency_subprice);
+				} elseif ($this->element == 'commande') {
+					$result = $this->updateline(
+						$this->lines[$i]->id,
+						$this->lines[$i]->desc,
+						$this->lines[$i]->subprice,
+						$this->lines[$i]->qty,
+						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
+						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$this->lines[$i]->localtax1_rate,
+						$this->lines[$i]->localtax2_rate,
+						'HT',
+						$this->lines[$i]->info_bits,
+						$this->lines[$i]->date_start,
+						$this->lines[$i]->date_end,
+						$this->lines[$i]->product_type,
+						$this->lines[$i]->fk_parent_line, 0,
+						$this->lines[$i]->fk_fournprice,
+						$this->lines[$i]->pa_ht,
+						$this->lines[$i]->label,
+						$this->lines[$i]->special_code,
+						$this->lines[$i]->array_options,
+						$this->lines[$i]->fk_unit,
+						$this->lines[$i]->multicurrency_subprice);
+				} elseif ($this->element == 'propal') {
+					$result = $this->updateline(
+						$this->lines[$i]->id,
+						$this->lines[$i]->subprice,
+						$this->lines[$i]->qty,
+						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
+						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$this->lines[$i]->localtax1_rate,
+						$this->lines[$i]->localtax2_rate,
+						$this->lines[$i]->desc,
+						'HT',
+						$this->lines[$i]->info_bits,
+						$this->lines[$i]->special_code,
+						$this->lines[$i]->fk_parent_line, 0,
+						$this->lines[$i]->fk_fournprice,
+						$this->lines[$i]->pa_ht,
+						$this->lines[$i]->label,
+						$this->lines[$i]->product_type,
+						$this->lines[$i]->date_start,
+						$this->lines[$i]->date_end,
+						$this->lines[$i]->array_options,
+						$this->lines[$i]->fk_unit,
+						$this->lines[$i]->multicurrency_subprice);
+				}
+			}
+		}
+
+	}
+
+	/**
 	 * Return the total_ht of lines that are above the current line (excluded) and that are not a subtotal line
 	 * until a title line of the same level is found
 	 *

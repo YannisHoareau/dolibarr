@@ -925,6 +925,10 @@ if (empty($reshook)) {
 				setEventMessages($langs->trans('ErrorsOnXLines', $error), null, 'errors');
 			}
 		}
+	} elseif ($action == 'applyvatforblock') {
+		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'tva');
+	} elseif ($action == 'applydiscountforblock') {
+		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'discount');
 	}
 
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
