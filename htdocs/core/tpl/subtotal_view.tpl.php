@@ -93,7 +93,7 @@ if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	$colspan +=1;
 }
-echo '<tr id="row-'.$line->id.'" class="drag drop" style="background:#'.$this->getSubtotalColors($line->qty).'">';
+echo '<tr data-level="'.$line->qty.'" id="row-'.$line->id.'" class="drag drop" style="background:#'.$this->getSubtotalColors($line->qty).'">';
 
 // Showing line number if conf is enabled
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
