@@ -102,19 +102,33 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 
 if ($line->qty > 0) { ?>
 		<?php $colspan = isModEnabled('multicurrency') && $this->multicurrency_code != $conf->currency ? $colspan+2 : $colspan+1 ?>
-	<td class="linecollabel"><?=str_repeat('&nbsp;', ($line->qty-1)*4);?><?= $line->desc ?></td>
-	<td class="inecolvat nowrap right">
-		<?php if($line->tva_tx != 0):?>
-			<?= vatrate($line->tva_tx, true)?>
-			<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=applyvatforblock&token='.newToken().'&lineid='.$line->id ?>"><?=img_picto($langs->trans("ApplyVATForBlock"), 'category')?></a>
-		<?php endif;?>
+	<td class="linecollabel"><?=str_repeat('&nbsp;', ($line->qty-1)*8);?><?= $line->desc ?></td>
+	<td class="linecolvat nowrap right">
+		<?php
+		if (GETPOST('mode', 'aZ09') == 'vatforblocklines' && GETPOST('lineid') == $line->id) {
+			print '<div class="inline-block nowraponall">';
+			print $form->load_tva('vatforblocklines', '', $seller, $buyer, 0, $line->info_bits, $line->product_type, false, 1, $type_tva);
+			print '<input type="hidden" name="lineid" value="'.$line->id.'">';
+			print '<input class="inline-block button smallpaddingimp" type="submit" name="submitforalllines" value="'.$langs->trans("Update").'">';
+			print '</div>';
+		} else {
+			print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&mode=vatforblocklines&lineid='.$line->id.'">'.img_edit($langs->trans("ApplyVATForBlock")).'</a>';
+		}
+		?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 2 ?>"></td>
 	<td class="linecoldiscount right">
-		<?php if($line->remise_percent != 0):?>
-			<?=dol_print_reduction((float) $line->remise_percent, $langs)?>
-			<a class="reposition" href="<?= $_SERVER["PHP_SELF"].'?id='.$this->id.'&action=applydiscountforblock&token='.newToken().'&lineid='.$line->id ?>"><?=img_picto($langs->trans("ApplyDiscountForBlock"), 'category')?></a>
-		<?php endif;?>
+		<?php
+		if (GETPOST('mode', 'aZ09') == 'discountforblocklines' && GETPOST('lineid') == $line->id) {
+			print '<div class="inline-block nowraponall">';
+			print '<input type="text" class="flat right width40" name="discountforblocklines" id="discountforblocklines" value="0"><span class="hideonsmartphone">%</span>';
+			print '<input type="hidden" name="lineid" value="'.$line->id.'">';
+			print '<input class="inline-block button smallpaddingimp" type="submit" name="submitforalllines" value="'.$langs->trans("Update").'">';
+			print '</div>';
+		} else {
+			print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&mode=discountforblocklines&lineid='.$line->id.'">'.img_edit($langs->trans("ApplyDiscountForBlock")).'</a>';
+		}
+		?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 4 ?>"></td>
 <?php } elseif ($line->qty < 0) { ?>

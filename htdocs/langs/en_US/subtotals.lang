@@ -28,8 +28,8 @@ NoTitleSet=You should set at least one title before adding any subtotal line
 CorrespondingSubtotalLine=Corresponding subtotal line
 SelectVATRate=Select VAT rate
 EnterRemisePercent=Enter discount percent
-ApplyVATForBlock=Apply %s%% VAT for this block
-ApplyDiscountForBlock=Apply %s%% discount for this block
+ApplyVATForBlock=Apply VAT for this block
+ApplyDiscountForBlock=Apply discount for this block
 
 #
 # PDF

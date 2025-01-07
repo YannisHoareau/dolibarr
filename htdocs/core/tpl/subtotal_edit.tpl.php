@@ -64,7 +64,7 @@ if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
 }
 
 // Base colspan if there is no module activated to display line correctly
-$colspan = 3;
+$colspan = 4;
 
 // Handling colspan if margin module is enabled
 if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
@@ -147,17 +147,7 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 			}
 		}
 		print '</ul></div></td>';
-
-		if ($line->qty > 0) {
-			print '<td class="right">';
-			print $form->load_tva('tva_tx', GETPOSTISSET('tva_tx') ? GETPOST('tva_tx', 'alpha') : ($line->tva_tx . ($line->vat_src_code ? (' (' . $line->vat_src_code . ')') : '')), $seller, $buyer, 0, $line->info_bits, $line->product_type, false, 1, $type_tva);
-			print '</td>';
-			print '<td colspan="'.($colspan - 1).'"></td>';
-			print '<td class="nowraponall right linecoldiscount"><input type="text" class="flat right width40" name="remise_percent" id="remise_percent" value="'.(GETPOSTISSET('remise_percent') ? GETPOST('remise_percent') : ($line->remise_percent ?? '')).'"><span class="hideonsmartphone opacitymedium">%</span></td>';
-			print '<td colspan="'.($colspan - 4).'"></td>';
-		} else {
-			$colspan += 2;
-		}
+		print '<td colspan="'.$colspan.'" class="right"></td>';
 	} else {
 		print '<input type="text" readonly name="line_desc" id="line_desc" value="';
 		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
@@ -166,7 +156,7 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	?>
 
 
-	<td class="center valignmiddle" colspan="5">
+	<td class="center valignmiddle" colspan="4">
 		<input type="submit" class="reposition button buttongen button-save" id="savelinebutton marginbottomonly" name="saveSubtotal" value="<?php echo $langs->trans("Save"); ?>"><br>
 		<input type="submit" class="reposition button buttongen button-cancel" id="cancellinebutton" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>">
 	</td>

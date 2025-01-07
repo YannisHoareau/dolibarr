@@ -189,12 +189,10 @@ trait CommonSubtotal
 	/**
 	 * Updates a block of subtotals line of a document
 	 */
-	public function updateSubtotalLineBlockLines($linerang, $mode)
+	public function updateSubtotalLineBlockLines($linerang, $mode, $value)
 	{
 
 		$linerang -= 1;
-		$remise_percent = $this->lines[$linerang]->remise_percent;
-		$tvatx = $this->lines[$linerang]->tva_tx;
 
 		for ($i = $linerang+1; $i < count($this->lines)+1; $i++) {
 			if ($this->lines[$i]->special_code == self::$SPECIAL_CODE) {
@@ -208,10 +206,10 @@ trait CommonSubtotal
 						$this->lines[$i]->desc,
 						$this->lines[$i]->subprice,
 						$this->lines[$i]->qty,
-						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,
 						$this->lines[$i]->date_start,
 						$this->lines[$i]->date_end,
-						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$mode == 'tva' ? $value : $this->lines[$i]->tvatx,
 						$this->lines[$i]->localtax1_tx,
 						$this->lines[$i]->localtax2_tx,
 						'HT',
@@ -232,8 +230,8 @@ trait CommonSubtotal
 						$this->lines[$i]->desc,
 						$this->lines[$i]->subprice,
 						$this->lines[$i]->qty,
-						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
-						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,
+						$mode == 'tva' ? $value : $this->lines[$i]->tvatx,
 						$this->lines[$i]->localtax1_rate,
 						$this->lines[$i]->localtax2_rate,
 						'HT',
@@ -254,8 +252,8 @@ trait CommonSubtotal
 						$this->lines[$i]->id,
 						$this->lines[$i]->subprice,
 						$this->lines[$i]->qty,
-						$mode == 'discount' ? $remise_percent : $this->lines[$i]->remise_percent,
-						$mode == 'tva' ? $tvatx : $this->lines[$i]->tvatx,
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,
+						$mode == 'tva' ? $value : $this->lines[$i]->tvatx,
 						$this->lines[$i]->localtax1_rate,
 						$this->lines[$i]->localtax2_rate,
 						$this->lines[$i]->desc,
@@ -275,7 +273,6 @@ trait CommonSubtotal
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -337,8 +334,6 @@ trait CommonSubtotal
 		if ($type == 'subtotal') {
 			$titles = $this->getPossibleTitles();
 		}
-
-		var_dump($titles);
 
 		$depth_array = $this->getPossibleLevels($langs);
 
