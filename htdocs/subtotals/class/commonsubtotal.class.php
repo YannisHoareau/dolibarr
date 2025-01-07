@@ -20,6 +20,13 @@ trait CommonSubtotal
 		return self::$SPECIAL_CODE;
 	}
 
+	public function isSubtotalLine($line) {
+		if ($line->special_code == self::$SPECIAL_CODE) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Adds a subtotal or a title line to a document
 	 */
@@ -325,15 +332,15 @@ trait CommonSubtotal
 	 */
 	public function getSubtotalForm($form, $langs, $type, $seller)
 	{
-		if ($type == 'subtotal') {
-			$titles = array();
+		$langs->load('subtotals');
 
-			foreach ($this->lines as $line) {
-				if ($line->special_code == self::$SPECIAL_CODE && $line->qty > 0) {
-					$titles[$line->id] = $line->desc;
-				}
-			}
+		if ($type == 'subtotal') {
+			$titles = $this->getPossibleTitles();
 		}
+
+		var_dump($titles);
+
+		$depth_array = $this->getPossibleLevels($langs);
 
 		$tpl = dol_buildpath('/core/tpl/subtotal_create.tpl.php');
 
@@ -354,5 +361,34 @@ trait CommonSubtotal
 	 */
 	public function getSubtotalColors($level) {
 		return getDolGlobalString('SUBTOTAL_BACK_COLOR_LEVEL_'.abs($level));
+	}
+
+	/**
+	 * Retrieve current object possible titles to choose from
+	 *
+	 * @return array The set of titles, empty if no title line set.
+	 */
+	public function getPossibleTitles() {
+		$titles = array();
+		foreach ($this->lines as $line) {
+			if ($line->special_code == self::$SPECIAL_CODE && $line->qty > 0) {
+				$titles[$line->desc] = $line->desc;
+			}
+		}
+		return $titles;
+	}
+
+	/**
+	 * Retrieve the current object possible levels (defined in admin page)
+	 *
+	 * @param Translate $langs
+	 * @return array The set of possible levels, empty if not defined correctly.
+	 */
+	public function getPossibleLevels($langs) {
+		$depth_array = array();
+		for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
+			$depth_array[$i + 1] = $langs->trans("Level", $i + 1);
+		}
+		return $depth_array;
 	}
 }

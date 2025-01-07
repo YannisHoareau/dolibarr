@@ -1,14 +1,8 @@
 <?php
-$langs->load('subtotals');
 
 if ($type == 'subtotal' && empty($titles)) {
 	setEventMessages("NoTitleSet", null, 'errors');
 	return;
-}
-# Define an array with all the possible levels for this module
-$depth_array = array();
-for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
-	$depth_array[$i + 1] = $langs->trans("Level", $i + 1);
 }
 
 if ($type == 'title') {

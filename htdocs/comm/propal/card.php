@@ -1055,11 +1055,13 @@ if (empty($reshook)) {
 			$langs->load('subtotals');
 
 			if ($line_type == 'subtotal') {
-				$choosen_line = GETPOST('subtotaltitleline', 'aZ09');
+				$choosen_line = GETPOST('subtotaltitleline');
 				foreach ($object->lines as $line) {
 					if ($line->id == $choosen_line) {
 						$desc = $line->desc;
 						$depth = -$line->qty;
+						$vatrate = 0;
+						$remisepercent = 0;
 					}
 				}
 			} else {
@@ -1607,18 +1609,34 @@ if (empty($reshook)) {
 
 		$line_edit_mode = GETPOST('line_edit_mode', 'aZ09');
 
-		$langs->load('subtotals');
-		$lineid = GETPOSTINT('lineid');
-		$desc = GETPOST('line_desc') ?? $langs->trans("Title");
-		$depth = GETPOSTINT('line_depth') ?? 1;
-		$depth = $line_edit_mode == 'subtotal' ? -$depth : $depth;
-		$vatrate = GETPOSTINT('tva_tx') ?? 0;
-		$remisepercent = GETPOSTINT('remise_percent') ?? 0;
-		// Insert line
-		$result = $object->updateSubtotalLine($lineid, $desc, $depth, $vatrate, $remisepercent);
+		// Handling adding line for subtotals module
+		if (in_array($line_edit_mode, ['subtotal', 'title'])) {
+			$langs->load('subtotals');
 
-		if ($result > 0) {
-			// TODO refresh pdf ?
+			$lineid = GETPOSTINT('lineid');
+
+			if ($line_edit_mode == 'subtotal') {
+				$choosen_line = GETPOST('subtotaltitleline');
+				foreach ($object->lines as $line) {
+					if ($line->desc == $choosen_line && $object->isSubtotalLine($line) && $line->qty > 0) {
+						$desc = $line->desc;
+						$depth = -$line->qty;
+						$vatrate = 0;
+						$remisepercent = 0;
+					}
+				}
+			} else {
+				$desc = GETPOST('line_desc') ?? $langs->trans("Title");
+				$depth = GETPOSTINT('line_depth') ?? 1;
+				$vatrate = GETPOSTINT('tva_tx') ?? 0;
+				$remisepercent = GETPOSTINT('remise_percent') ?? 0;
+			}
+
+			// Update line
+			$result = $object->updateSubtotalLine($lineid, $desc, $depth, $vatrate, $remisepercent);
+
+			if ($result > 0) {
+				// TODO refresh pdf ?
 //				$ret = $object->fetch($object->id); // Reload to get new records
 //				$object->fetch_thirdparty();
 //
@@ -1637,13 +1655,14 @@ if (empty($reshook)) {
 //					$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 //				}
 
-			unset($_POST['line_edit_mode']);
-			unset($_POST['line_desc']);
-			unset($_POST['line_depth']);
-			unset($_POST['special_code']);
-			unset($_POST['type']);
-		} else {
-			setEventMessages($object->error, $object->errors, 'errors');
+				unset($_POST['line_edit_mode']);
+				unset($_POST['line_desc']);
+				unset($_POST['line_depth']);
+				unset($_POST['special_code']);
+				unset($_POST['type']);
+			} else {
+				setEventMessages($object->error, $object->errors, 'errors');
+			}
 		}
 	} elseif ($action == 'updateline' && $usercancreate && GETPOST('save')) {
 		// Update a line within proposal

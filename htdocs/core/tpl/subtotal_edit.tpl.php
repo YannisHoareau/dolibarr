@@ -108,8 +108,6 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 
 	$line_edit_mode = $line->qty < 0 ? 'subtotal' : 'title';
 
-	$level = abs($line->qty);
-
 	print '<input type="hidden" name="line_edit_mode" value="'.$line_edit_mode.'">';
 
 	$situationinvoicelinewithparent = 0;
@@ -129,17 +127,19 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	}
 
 	$langs->load('subtotals');
-	$depth_array = array();
-	for ($i = 0; $i < getDolGlobalString('SUBTOTAL_'.strtoupper($this->element).'_MAX_DEPTH', 2); $i++) {
-		$depth_array[$i + 1] = $langs->trans("Level", $i + 1);
-	}
+
 
 	if (!$situationinvoicelinewithparent) {
-		print '<input type="text" name="line_desc" class="marginrightonly" id="line_desc" value="';
-		print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
-		print '">';
-		print $form->selectarray('line_depth', $depth_array, $level);
-		$selected = 0;
+		if ($line_edit_mode == 'title') {
+			print '<input type="text" name="line_desc" class="marginrightonly" id="line_desc" value="';
+			print GETPOSTISSET('product_desc') ? GETPOST('product_desc', 'restricthtml') : $line->description;
+			print '">';
+			$depth_array = $this->getPossibleLevels($langs);
+			print $form->selectarray('line_depth', $depth_array, abs($line->qty));
+		} elseif ($line_edit_mode == 'subtotal') {
+			$titles = $this->getPossibleTitles();
+			print $form->selectarray('subtotaltitleline', $titles, $line->desc);
+		}
 		print '<div><ul class="ecmjqft">';
 		foreach ($line_options as $key => $value) {
 			if (in_array($line_type, $value['type'])) {
