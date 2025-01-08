@@ -136,9 +136,6 @@ if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 			print '">';
 			$depth_array = $this->getPossibleLevels($langs);
 			print $form->selectarray('line_depth', $depth_array, abs($line->qty));
-		} elseif ($line_edit_mode == 'subtotal') {
-			$titles = $this->getPossibleTitles();
-			print $form->selectarray('subtotaltitleline', $titles, $line->desc);
 		}
 		print '<div><ul class="ecmjqft">';
 		foreach ($line_options as $key => $value) {

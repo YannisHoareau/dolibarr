@@ -1,7 +1,7 @@
 <?php
 
 if ($type == 'subtotal' && empty($titles)) {
-	setEventMessages("NoTitleSet", null, 'errors');
+	setEventMessages("NoTitleError", null, 'errors');
 	return;
 }
 

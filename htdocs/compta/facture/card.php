@@ -2693,19 +2693,15 @@ if (empty($reshook)) {
 					if ($line->desc == $choosen_line && $object->isSubtotalLine($line) && $line->qty > 0) {
 						$desc = $line->desc;
 						$depth = -$line->qty;
-						$vatrate = 0;
-						$remisepercent = 0;
 					}
 				}
 			} else {
 				$desc = GETPOST('line_desc') ?? $langs->trans("Title");
 				$depth = GETPOSTINT('line_depth') ?? 1;
-				$vatrate = GETPOSTINT('tva_tx') ?? 0;
-				$remisepercent = GETPOSTINT('remise_percent') ?? 0;
 			}
 
 			// Update line
-			$result = $object->updateSubtotalLine($lineid, $desc, $depth, $vatrate, $remisepercent);
+			$result = $object->updateSubtotalLine($lineid, $desc, $depth);
 
 			if ($result > 0) {
 				// TODO refresh pdf ?

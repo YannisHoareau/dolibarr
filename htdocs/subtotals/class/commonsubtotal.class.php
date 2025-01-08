@@ -30,7 +30,7 @@ trait CommonSubtotal
 	/**
 	 * Adds a subtotal or a title line to a document
 	 */
-	public function addSubtotalLine($desc, $depth, $vatrate = 0, $remisepercent = 0)
+	public function addSubtotalLine($desc, $depth)
 	{
 		$current_module = $this->element;
 		// Ensure the object is one of the supported types
@@ -45,11 +45,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				$vatrate,				// VAT rate
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				$remisepercent,			// Discount percentage
+				0,						// Discount percentage
 				'',						// Date start
 				'',						// Date end
 				0,						// FK code ventilation
@@ -66,11 +66,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				$vatrate,				// VAT rate
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				$remisepercent,			// Discount percentage
+				0,						// Discount percentage
 				'',						// Price base type
 				0,						// PU ttc
 				0,						// Info bits
@@ -83,11 +83,11 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				$vatrate,				// VAT rate
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				null,					// FK product
-				$remisepercent,			// Discount percentage
+				0,						// Discount percentage
 				0,						// Info bits
 				0,						// FK remise except
 				'',						// Price base type
@@ -106,7 +106,7 @@ trait CommonSubtotal
 	/**
 	 * Updates a subtotals line to a document
 	 */
-	public function updateSubtotalLine($lineid, $desc, $depth, $vatrate = 0, $remisepercent = 0)
+	public function updateSubtotalLine($lineid, $desc, $depth)
 	{
 
 		$current_module = $this->element;
@@ -116,6 +116,21 @@ trait CommonSubtotal
 			return false; // Unsupported type
 		}
 
+		if ($depth>0) {
+			$oldDesc = "";
+			$oldDepth =  0;
+			foreach ($this->lines as $line) {
+				if ($line->id == $lineid) {
+					$oldDesc = $line->desc;
+					$oldDepth = $line->qty;
+				}
+				if ($line->special_code == self::$SPECIAL_CODE && $line->qty == -$oldDepth && $line->desc == $oldDesc) {
+					$this->updateSubtotalLine($line->id, $desc, -$depth);
+					break;
+				}
+			}
+		}
+
 		// Update the line calling the right module
 		if ($current_module == 'facture') {
 			$result = $this->updateline(
@@ -123,10 +138,10 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				$remisepercent,			// Discount percentage
+				0,						// Discount percentage
 				'',						// Date start
 				'',						// Date end
-				$vatrate,				// VAT rate
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				'',						// Price base type
@@ -144,8 +159,8 @@ trait CommonSubtotal
 				$lineid, 				// ID of line to change
 				0,						// Unit price
 				$depth,					// Quantity
-				$remisepercent,			// Discount percentage
-				$vatrate,				// VAT rate
+				0,						// Discount percentage
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				$desc,					// Description
@@ -165,8 +180,8 @@ trait CommonSubtotal
 				$desc,					// Description
 				0,						// Unit price
 				$depth,					// Quantity
-				$remisepercent,			// Discount percentage
-				$vatrate,				// VAT rate
+				0,						// Discount percentage
+				0,						// VAT rate
 				0,						// Local tax 1
 				0,						// Local tax 2
 				'',						// Price base type
@@ -368,6 +383,9 @@ trait CommonSubtotal
 		foreach ($this->lines as $line) {
 			if ($line->special_code == self::$SPECIAL_CODE && $line->qty > 0) {
 				$titles[$line->desc] = $line->desc;
+			}
+			if ($line->special_code == self::$SPECIAL_CODE && $line->qty < 0) {
+				unset($titles[$line->desc]);
 			}
 		}
 		return $titles;
