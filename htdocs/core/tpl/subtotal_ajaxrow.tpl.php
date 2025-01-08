@@ -44,7 +44,7 @@ if (empty($object) || !is_object($object)) {
 
 ?>
 
-<!-- BEGIN PHP TEMPLATE AJAXROW.TPL.PHP - Script to enable drag and drop on lines of a table -->
+<!-- BEGIN PHP TEMPLATE SUBTOTAL_AJAXROW.TPL.PHP - Script to enable drag and drop on lines of a table using subtotal lines -->
 <?php
 $id = $object->id;
 $fk_element = empty($object->fk_element) ? $fk_element : $object->fk_element;
@@ -68,13 +68,15 @@ $(document).ready(function(){
 	var rowsToMove = [];
 	$("#<?php echo $tagidfortablednd; ?>").tableDnD({
 		onDragStart: function (table, row) {
-			console.log(row.parentNode.dataset.level);
-			if (row.parentNode.dataset.level !== undefined) {
+			if (row.parentNode.dataset.level > 0) {
 				var hide = false;
 				$("#<?php echo $tagidfortablednd; ?> .drag").each(
 					function (intIndex) {
-						// console.log($(this)[0].id, row.parentNode.id);
 						if (hide) {
+							if ($(this)[0].dataset.level>-row.parentNode.dataset.level && $(this)[0].dataset.level<=row.parentNode.dataset.level) {
+								hide = false;
+								return;
+							}
 							rowsToMove.unshift($(this));
 							$(this).hide();
 							if (Math.abs($(this)[0].dataset.level) <= Math.abs(row.parentNode.dataset.level)) {
@@ -86,9 +88,17 @@ $(document).ready(function(){
 							hide = true;
 						}
 					});
+				// If hide still true, no other line found, so we don't regroup
+				if (hide) {
+					rowsToMove.forEach(function ($hiddenRow) {
+						$hiddenRow.insertAfter($("#" + row.parentNode.id)); // Insère après la ligne déplacée
+						$hiddenRow.show();
+					});
+					rowsToMove = [];
+				}
 			}
 		},
-		onDrop: function(table, row) {
+		onDragStop: function(table, row) {
 			if (rowsToMove.length !== 0) {
 				rowsToMove.forEach(function ($hiddenRow) {
 					$hiddenRow.insertAfter($("#" + row.id)); // Insère après la ligne déplacée
@@ -98,7 +108,7 @@ $(document).ready(function(){
 			}
 			var reloadpage = "<?php echo $forcereloadpage; ?>";
 			console.log("tableDND onDrop");
-			console.log($("#<?php echo $tagidfortablednd; ?> .drag"));
+			console.log(decodeURI($("#<?php echo $tagidfortablednd; ?>").tableDnDSerialize()));
 			$('#<?php echo $tagidfortablednd; ?> tr[data-element=extrafield]').attr('id', '');	// Set extrafields id to empty value in order to ignore them in tableDnDSerialize function
 			$('#<?php echo $tagidfortablednd; ?> tr[data-ignoreidfordnd=1]').attr('id', '');	// Set id to empty value in order to ignore them in tableDnDSerialize function
 			var roworder = cleanSerialize(decodeURI($("#<?php echo $tagidfortablednd; ?>").tableDnDSerialize()));

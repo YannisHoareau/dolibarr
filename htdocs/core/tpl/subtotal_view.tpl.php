@@ -131,7 +131,8 @@ if ($line->qty > 0) { ?>
 		?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 4 ?>"></td>
-<?php } elseif ($line->qty < 0) { ?>
+<?php } elseif ($line->qty < 0) {
+		$disablemove = true?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan + 2 ?>"><?= $line->desc.' :' ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
@@ -175,5 +176,6 @@ if ($num > 1 && $conf->browser->layout != 'phone' && ((property_exists($this, 's
 	echo '<td '.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'></td>';
 }
 echo '</tr>';
+$disablemove = "";
 echo '<!-- END PHP TEMPLATE subtotal_view.tpl.php -->';
 ?>
