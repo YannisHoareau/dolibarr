@@ -38,6 +38,15 @@ trait CommonSubtotal
 		if (!in_array($current_module, $allowed_types)) {
 			return false; // Unsupported type
 		}
+		$rang = -1;
+
+		if ($depth<0) {
+			foreach ($this->lines as $line) {
+				if ($line->desc == $desc && $line->qty == -$depth) {
+					$rang = $line->rang+1;
+				}
+			}
+		}
 
 		// Add the line calling the right module
 		if ($current_module == 'facture') {
@@ -58,7 +67,7 @@ trait CommonSubtotal
 				'',						// Price base type
 				0,						// PU ttc
 				self::$PRODUCT_TYPE,	// Type
-				-1,						// Rang
+				$rang,					// Rang
 				self::$SPECIAL_CODE		// Special code
 			);
 		} elseif ($current_module== 'propal') {
@@ -75,7 +84,7 @@ trait CommonSubtotal
 				0,						// PU ttc
 				0,						// Info bits
 				self::$PRODUCT_TYPE,	// Type
-				-1,						// Rang
+				$rang,					// Rang
 				self::$SPECIAL_CODE		// Special code
 			);
 		} elseif ($current_module== 'commande') {
@@ -95,7 +104,7 @@ trait CommonSubtotal
 				'',						// Date start
 				'',						// Date end
 				self::$PRODUCT_TYPE,	// Type
-				-1,						// Rang
+				$rang,					// Rang
 				self::$SPECIAL_CODE		// Special code
 			);
 		}
