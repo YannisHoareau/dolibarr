@@ -93,7 +93,7 @@ if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX')) {
 if (getDolGlobalString('PRODUCT_USE_UNITS')) {
 	$colspan +=1;
 }
-echo '<tr data-level="'.$line->qty.'" id="row-'.$line->id.'" class="drag drop" style="background:#'.$this->getSubtotalColors($line->qty).'">';
+echo '<tr data-level="'.$line->qty.'" data-desc="'.$line->desc.'" data-rang="'.$line->rang.'" id="row-'.$line->id.'" class="drag drop" style="background:#'.$this->getSubtotalColors($line->qty).'">';
 
 // Showing line number if conf is enabled
 if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
@@ -131,8 +131,7 @@ if ($line->qty > 0) { ?>
 		?>
 	</td>
 	<td class="linecollabel" colspan="<?= $colspan - 4 ?>"></td>
-<?php } elseif ($line->qty < 0) {
-		$disablemove = true?>
+<?php } elseif ($line->qty < 0) {?>
 		<td class="linecollabel nowrap right" colspan="<?= $colspan + 2 ?>"><?= $line->desc.' :' ?></td>
 		<td class="linecolamount nowrap right">
 			<?php
@@ -176,6 +175,5 @@ if ($num > 1 && $conf->browser->layout != 'phone' && ((property_exists($this, 's
 	echo '<td '.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'></td>';
 }
 echo '</tr>';
-$disablemove = "";
 echo '<!-- END PHP TEMPLATE subtotal_view.tpl.php -->';
 ?>

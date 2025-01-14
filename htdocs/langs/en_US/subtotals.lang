@@ -30,6 +30,10 @@ SelectVATRate=Select VAT rate
 EnterRemisePercent=Enter discount percent
 ApplyVATForBlock=Apply VAT for this block
 ApplyDiscountForBlock=Apply discount for this block
+TitleUnderSameLevelSTLine=Title of the same level must be under the previous title's subtotal line.
+TitleUnderSameLevelOrGreater=Title must be under a title of the same level or greater.
+STLineUnderCorrespondingTitleDesc=Subtotal line must be under a title with the same level that has the same description.
+STLineUnderCorrespondingTitle=Subtotal line must be under a title of the same level and the same description.
 
 #
 # PDF

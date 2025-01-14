@@ -53,10 +53,26 @@ $nboflines = (isset($object->lines) ? count($object->lines) : (isset($tasksarray
 $forcereloadpage = !getDolGlobalString('MAIN_FORCE_RELOAD_PAGE') ? 0 : 1;
 $tagidfortablednd = (empty($tagidfortablednd) ? 'tablelines' : $tagidfortablednd);
 $filepath = (empty($filepath) ? '' : $filepath);
+$langs->load("subtotals");
 
 if (GETPOST('action', 'aZ09') != 'editline' && $nboflines > 1 && $conf->browser->layout != 'phone') { ?>
+<div id="notification-message" hidden=""></div>
 <script>
-$(document).ready(function(){
+function openDialog() {
+	jQuery(function() {
+		jQuery("#notification-message").dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				Ok: function() {
+					jQuery(this).dialog('close');
+				}
+			}
+		});
+	});
+}
+
+function init(){
 	$(".imgupforline").hide();
 	$(".imgdownforline").hide();
 	$(".lineupdown").removeAttr('href');
@@ -65,6 +81,7 @@ $(document).ready(function(){
 	$(".tdlineupdown").css("background-position","center center");
 
 	console.log("Prepare tableDnd for #<?php echo $tagidfortablednd; ?>");
+	var inital_table = $("#<?php echo $tagidfortablednd; ?> .drag").map((_, el) => $(el)[0]).get();
 	var rowsToMove = [];
 	$("#<?php echo $tagidfortablednd; ?>").tableDnD({
 		onDragStart: function (table, row) {
@@ -75,10 +92,9 @@ $(document).ready(function(){
 						if (hide) {
 							if ($(this)[0].dataset.level>-row.parentNode.dataset.level && $(this)[0].dataset.level<=row.parentNode.dataset.level) {
 								hide = false;
-								return;
+								return false;
 							}
 							rowsToMove.unshift($(this));
-							$(this).hide();
 							if (Math.abs($(this)[0].dataset.level) <= Math.abs(row.parentNode.dataset.level)) {
 								hide = false;
 							}
@@ -88,24 +104,29 @@ $(document).ready(function(){
 							hide = true;
 						}
 					});
-				// If hide still true, no other line found, so we don't regroup
-				if (hide) {
-					rowsToMove.forEach(function ($hiddenRow) {
-						$hiddenRow.insertAfter($("#" + row.parentNode.id)); // Insère après la ligne déplacée
-						$hiddenRow.show();
+				if (!hide) {
+					rowsToMove.forEach(function ($hiddenRow, i) {
+						if (i<rowsToMove.length-1) {
+							$hiddenRow.hide();
+						}
 					});
+				} else {
 					rowsToMove = [];
 				}
 			}
 		},
 		onDragStop: function(table, row) {
 			if (rowsToMove.length !== 0) {
-				rowsToMove.forEach(function ($hiddenRow) {
-					$hiddenRow.insertAfter($("#" + row.id)); // Insère après la ligne déplacée
-					$hiddenRow.show();
+				rowsToMove.forEach(function (hiddenRow) {
+					hiddenRow.insertAfter($("#" + row.id));
+					hiddenRow.show();
 				});
 				rowsToMove = [];
 			}
+
+			checkLinePosition(row, inital_table);
+			inital_table = $("#<?php echo $tagidfortablednd; ?> .drag").map((_, el) => $(el)[0]).get();
+
 			var reloadpage = "<?php echo $forcereloadpage; ?>";
 			console.log("tableDND onDrop");
 			console.log(decodeURI($("#<?php echo $tagidfortablednd; ?>").tableDnDSerialize()));
@@ -118,34 +139,26 @@ $(document).ready(function(){
 			var filepath = "<?php echo urlencode($filepath); ?>";
 			var token = "<?php echo currentToken(); ?>";	// We use old 'token' and not 'newtoken' for Ajax call because the ajax page has the NOTOKENRENEWAL constant set.
 			$.post("<?php echo DOL_URL_ROOT; ?>/core/ajax/row.php",
-					{
-						roworder: roworder,
-						table_element_line: table_element_line,
-						fk_element: fk_element,
-						element_id: element_id,
-						filepath: filepath,
-						token: token
-					},
-					function() {
-						console.log("tableDND end of ajax call");
-						console.log(roworder, table_element_line, fk_element, element_id, filepath, token);
-						if (reloadpage == 1) {
-							<?php
-							$redirectURL = empty($urltorefreshaftermove) ? ($_SERVER['PHP_SELF'].'?'.dol_escape_js($_SERVER['QUERY_STRING'])) : $urltorefreshaftermove;
-							// remove action parameter from URL
-							$redirectURL = preg_replace('/(&|\?)action=[^&#]*/', '', $redirectURL);
-							?>
-							location.href = '<?php echo dol_escape_js($redirectURL); ?>';
-						} else {
-							$("#<?php echo $tagidfortablednd; ?> .drag").each(
-									function( intIndex ) {
-										// $(this)[0].style.display = '';
-										// $(this).removeClass("pair impair");
-										//if (intIndex % 2 == 0) $(this).addClass('impair');
-										//if (intIndex % 2 == 1) $(this).addClass('pair');
-									});
-						}
-					});
+				{
+					roworder: roworder,
+					table_element_line: table_element_line,
+					fk_element: fk_element,
+					element_id: element_id,
+					filepath: filepath,
+					token: token
+				},
+				function() {
+					console.log("tableDND end of ajax call");
+					console.log(roworder, table_element_line, fk_element, element_id, filepath, token);
+					if (reloadpage == 1) {
+						<?php
+						$redirectURL = empty($urltorefreshaftermove) ? ($_SERVER['PHP_SELF'].'?'.dol_escape_js($_SERVER['QUERY_STRING'])) : $urltorefreshaftermove;
+						// remove action parameter from URL
+						$redirectURL = preg_replace('/(&|\?)action=[^&#]*/', '', $redirectURL);
+						?>
+						location.href = '<?php echo dol_escape_js($redirectURL); ?>';
+					}
+				});
 		},
 		onDragClass: "dragClass",
 		dragHandle: "td.tdlineupdown"
@@ -153,7 +166,80 @@ $(document).ready(function(){
 	$(".tdlineupdown").hover( function() { $(this).addClass('showDragHandle'); },
 		function() { $(this).removeClass('showDragHandle'); }
 	);
+}
+
+function checkLinePosition(row, inital_table) {
+	const tbody = $("#<?php echo $tagidfortablednd; ?> .drag").map((_, el) => $(el)[0]).get();
+
+	for (var k = 0; k < tbody.length; k++) {
+		const currentRow = tbody[k];
+		if (currentRow.dataset.rang !== undefined) {
+			currentRow.dataset.rang = k+1;
+		}
+	}
+
+	var rowLevel = parseInt(row.dataset.level);
+	var cancelLineMove = false;
+
+	for (var i = row.dataset.rang-2; i >= 0; i--) {
+
+		if (tbody[i].dataset.desc !== undefined) {
+			const currentRowLevel1 = parseInt(tbody[i].dataset.level, 10);
+			console.log(currentRowLevel1, rowLevel, currentRowLevel1 === rowLevel);
+			if (rowLevel > 0) {
+				// Title line placement managing
+				if (currentRowLevel1 === rowLevel) {
+					for (var j = row.dataset.rang; j < tbody.length; j++) {
+						if (tbody[j].dataset.desc !== undefined) {
+							const currentRowLevel2 = parseInt(tbody[j].dataset.level, 10);
+							if (tbody[i].dataset.desc === tbody[j].dataset.desc && currentRowLevel1 === -currentRowLevel2) {
+								$("#notification-message").text("<?= $langs->trans("TitleUnderSameLevelSTLine"); ?>");
+								cancelLineMove = true;
+								break;
+							}
+						}
+					}
+				} else if (currentRowLevel1 < rowLevel) {
+					break;
+					// console.log(tbody[i].dataset.desc, currentRowLevel1, rowLevel);
+				} else {
+					$("#notification-message").text("<?= $langs->trans("TitleUnderSameLevelOrGreater"); ?>");
+					cancelLineMove = true;
+					break;
+				}
+			} else if (rowLevel < 0) {
+				// Subtotal line placement managing
+				if (currentRowLevel1 < 0 && rowLevel <= currentRowLevel1 || currentRowLevel1 >0 && -rowLevel >= currentRowLevel1) {
+					console.log(rowLevel, currentRowLevel1);
+					if (tbody[i].dataset.desc === row.dataset.desc) {
+						break;
+					}else if (-rowLevel === currentRowLevel1) {
+						$("#notification-message").text("<?= $langs->trans("STLineUnderCorrespondingTitleDesc"); ?>");
+						cancelLineMove = true;
+						break;
+					} else if (-rowLevel > currentRowLevel1) {
+						$("#notification-message").text("<?= $langs->trans("STLineUnderCorrespondingTitle"); ?>");
+						cancelLineMove = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if (cancelLineMove) {
+		const tbody_to_replace = $(row).parent()[0];
+		$(tbody_to_replace).empty();
+		$(tbody_to_replace).append(inital_table);
+		init();
+		openDialog();
+	}
+}
+
+$(document).ready(function(){
+	init()
 });
+
 </script>
 <?php } else { ?>
 <script>
