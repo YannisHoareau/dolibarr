@@ -113,6 +113,45 @@ trait CommonSubtotal
 	}
 
 	/**
+	 * Delete a subtotal or a title line to a document
+	 */
+	public function deleteSubtotalLine($id, $correspondingstline = false, $user = null)
+	{
+		$current_module = $this->element;
+		// Ensure the object is one of the supported types
+		$allowed_types = array('propal', 'commande', 'facture');
+		if (!in_array($current_module, $allowed_types)) {
+			return false; // Unsupported type
+		}
+
+		if ($correspondingstline) {
+			$oldDesc = "";
+			$oldDepth =  0;
+			foreach ($this->lines as $line) {
+				if ($line->id == $id) {
+					$oldDesc = $line->desc;
+					$oldDepth = $line->qty;
+				}
+				if ($line->special_code == self::$SPECIAL_CODE && $line->qty == -$oldDepth && $line->desc == $oldDesc) {
+					$this->deleteSubtotalLine($line->id, false, $user);
+					break;
+				}
+			}
+		}
+
+		// Add the line calling the right module
+		if ($current_module == 'facture') {
+			$result = $this->deleteLine($id);
+		} elseif ($current_module== 'propal') {
+			$result = $this->deleteLine($id);
+		} elseif ($current_module== 'commande') {
+			$result = $this->deleteLine($user, $id);
+		}
+
+		return $result >= 0 ? $result : -1; // Return line ID or false
+	}
+
+	/**
 	 * Updates a subtotals line to a document
 	 */
 	public function updateSubtotalLine($lineid, $desc, $depth)

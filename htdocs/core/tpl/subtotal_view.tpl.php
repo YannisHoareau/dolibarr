@@ -154,7 +154,11 @@ echo '</td>';
 
 // Delete picto
 echo '<td class="linecoldelete center">';
-echo '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=ask_deleteline&token='.newToken().'&lineid='.$line->id.'">'.img_delete().'</a>';
+echo '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&action=ask_subtotal_deleteline&token='.newToken().'&lineid='.$line->id;
+if ($line->qty > 0) {
+	echo '&type=title';
+}
+echo '">'.img_delete().'</a>';
 echo '</td>';
 
 // Move up-down picto
