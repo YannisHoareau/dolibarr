@@ -32,8 +32,11 @@ ApplyVATForBlock=Apply VAT for this block
 ApplyDiscountForBlock=Apply discount for this block
 TitleUnderSameLevelSTLine=Title of the same level must be under the previous title's subtotal line.
 TitleUnderSameLevelOrGreater=Title must be under a title of the same level or greater.
+TitleAfterStLineOfSameLevelTitle=Title must be after the subtotal line of the previous same title level.
+PreviousTitleLevelTooHigh=Previous title is two level or more greater than moved line.
 STLineUnderCorrespondingTitleDesc=Subtotal line must be under a title with the same level that has the same description.
 STLineUnderCorrespondingTitle=Subtotal line must be under a title of the same level and the same description.
+STLineUnderTitle=Subtotal line must be under its title
 
 #
 # PDF

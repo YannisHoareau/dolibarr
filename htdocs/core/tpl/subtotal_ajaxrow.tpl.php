@@ -124,7 +124,9 @@ function init(){
 				rowsToMove = [];
 			}
 
-			checkLinePosition(row, inital_table);
+			if (row.dataset.desc !== undefined) {
+				checkLinePosition(row, inital_table);
+			}
 			inital_table = $("#<?php echo $tagidfortablednd; ?> .drag").map((_, el) => $(el)[0]).get();
 
 			var reloadpage = "<?php echo $forcereloadpage; ?>";
@@ -180,6 +182,7 @@ function checkLinePosition(row, inital_table) {
 
 	var rowLevel = parseInt(row.dataset.level);
 	var cancelLineMove = false;
+	var found_title = rowLevel >= 0;
 
 	for (var i = row.dataset.rang-2; i >= 0; i--) {
 
@@ -188,7 +191,17 @@ function checkLinePosition(row, inital_table) {
 			console.log(currentRowLevel1, rowLevel, currentRowLevel1 === rowLevel);
 			if (rowLevel > 0) {
 				// Title line placement managing
-				if (currentRowLevel1 === rowLevel) {
+				if (-currentRowLevel1 === rowLevel) {
+					break;
+				} else if (currentRowLevel1 > 0 && currentRowLevel1 < rowLevel) {
+					if (rowLevel - currentRowLevel1 > 1) {
+						$("#notification-message").text("<?= $langs->trans("PreviousTitleLevelTooHigh"); ?>");
+						cancelLineMove = true;
+						break;
+					}
+					break;
+					// console.log(tbody[i].dataset.desc, currentRowLevel1, rowLevel);
+				} else if (currentRowLevel1 === rowLevel) {
 					for (var j = row.dataset.rang; j < tbody.length; j++) {
 						if (tbody[j].dataset.desc !== undefined) {
 							const currentRowLevel2 = parseInt(tbody[j].dataset.level, 10);
@@ -199,9 +212,18 @@ function checkLinePosition(row, inital_table) {
 							}
 						}
 					}
-				} else if (currentRowLevel1 < rowLevel) {
+				} else if (currentRowLevel1 > rowLevel) {
+					for (var j = row.dataset.rang; j < tbody.length; j++) {
+						if (tbody[j].dataset.desc !== undefined) {
+							const currentRowLevel2 = parseInt(tbody[j].dataset.level, 10);
+							if (row.dataset.desc !== tbody[j].dataset.desc && currentRowLevel2 <= -rowLevel) {
+								$("#notification-message").text("<?= $langs->trans("TitleAfterStLineOfSameLevelTitle"); ?>");
+								cancelLineMove = true;
+								break;
+							}
+						}
+					}
 					break;
-					// console.log(tbody[i].dataset.desc, currentRowLevel1, rowLevel);
 				} else {
 					$("#notification-message").text("<?= $langs->trans("TitleUnderSameLevelOrGreater"); ?>");
 					cancelLineMove = true;
@@ -212,6 +234,7 @@ function checkLinePosition(row, inital_table) {
 				if (currentRowLevel1 < 0 && rowLevel <= currentRowLevel1 || currentRowLevel1 >0 && -rowLevel >= currentRowLevel1) {
 					console.log(rowLevel, currentRowLevel1);
 					if (tbody[i].dataset.desc === row.dataset.desc) {
+						found_title = true;
 						break;
 					}else if (-rowLevel === currentRowLevel1) {
 						$("#notification-message").text("<?= $langs->trans("STLineUnderCorrespondingTitleDesc"); ?>");
@@ -225,6 +248,10 @@ function checkLinePosition(row, inital_table) {
 				}
 			}
 		}
+	}
+	if (!found_title) {
+		$("#notification-message").text("<?= $langs->trans("STLineUnderTitle"); ?>");
+		cancelLineMove = true;
 	}
 
 	if (cancelLineMove) {
