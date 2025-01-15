@@ -32,6 +32,10 @@ trait CommonSubtotal
 	 */
 	public function addSubtotalLine($desc, $depth)
 	{
+		if (empty($desc)) {
+			setEventMessages("TitleNeedDesc", null, 'errors');
+			return 0;
+		}
 		$current_module = $this->element;
 		// Ensure the object is one of the supported types
 		$allowed_types = array('propal', 'commande', 'facture');
@@ -58,8 +62,8 @@ trait CommonSubtotal
 		}
 
 		if ($max_existing_level+1 < $depth) {
-			setEventMessages("TitleLevelTooHigh", null, 'errors');
-			return 0;
+			$depth = $max_existing_level+1;
+			setEventMessages("TitleLevelTooHigh", array("TitleCreatedAfterError"), 'errors');
 		}
 
 		// Add the line calling the right module
@@ -176,6 +180,21 @@ trait CommonSubtotal
 		$allowed_types = array('propal', 'commande', 'facture');
 		if (!in_array($current_module, $allowed_types)) {
 			return false; // Unsupported type
+		}
+
+		$max_existing_level = 0;
+
+		if ($depth>0) {
+			foreach ($this->lines as $line) {
+				if ($line->special_code == self::$SPECIAL_CODE && $line->qty > $max_existing_level && $line->id != $lineid) {
+					$max_existing_level = $line->qty;
+				}
+			}
+		}
+
+		if ($max_existing_level+1 < $depth) {
+			setEventMessages("TitleLevelTooHigh", null, 'errors');
+			return 0;
 		}
 
 		if ($depth>0) {

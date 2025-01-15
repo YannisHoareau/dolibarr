@@ -2213,7 +2213,7 @@ if (empty($reshook)) {
 					}
 				}
 			} else {
-				$desc = GETPOST('subtotallinedesc') ?? $langs->trans("Title");
+				$desc = GETPOST('subtotallinedesc', 'aZ09');
 				$depth = GETPOSTINT('subtotallinelevel') ?? 1;
 			}
 
