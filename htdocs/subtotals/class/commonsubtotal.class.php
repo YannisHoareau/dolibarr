@@ -44,11 +44,17 @@ trait CommonSubtotal
 		}
 		$max_existing_level = 0;
 		$rang = -1;
+		$next_line = false;
 
 		if ($depth<0) {
 			foreach ($this->lines as $line) {
 				if ($line->desc == $desc && $line->qty == -$depth) {
-					$rang = $line->rang+1;
+					$next_line = true;
+					continue;
+				}
+				if ($next_line && $line->special_code == self::$SPECIAL_CODE && abs($line->qty) <= abs($depth)) {
+					$rang = $line->rang;
+					break;
 				}
 			}
 		}
