@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2000-2007	Rodolphe Quiedeville		<rodolphe@quiedeville.org>
  * Copyright (C) 2003		Jean-Louis Bergamo			<jlb@j1b.org>
  * Copyright (C) 2004-2024	Laurent Destailleur			<eldy@users.sourceforge.net>
@@ -21,7 +22,7 @@
  * Copyright (C) 2022       Ferran Marcet           	<fmarcet@2byte.es>
  * Copyright (C) 2022       Charlene Benke           	<charlene@patas-monkey.com>
  * Copyright (C) 2023       Joachim Kueter              <git-jk@bloxera.com>
- * Copyright (C) 2024		MDW							<mdeweerd@users.noreply.github.com>
+ * Copyright (C) 2024-2025	MDW							<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024		Lenin Rivas					<lenin.rivas777@gmail.com>
  * Copyright (C) 2024		Josep Lluís Amador Teruel	<joseplluis@lliuretic.cat>
  * Copyright (C) 2024		Benoît PASCAL				<contact@p-ben.com>
@@ -9686,9 +9687,9 @@ function getCommonSubstitutionArray($outputlangs, $onlykey = 0, $exclude = null,
  *  $mesg = make_substitutions($mesg, $substitutionarray, $langs);
  *
  *  @param	string		$text	      					Source string in which we must do substitution
- *  @param  array<string,string>	$substitutionarray	Array with key->val to substitute. Example: array('__MYKEY__' => 'MyVal', ...)
+ *  @param  array<string,null|string|float|int>	$substitutionarray	Array with key->val to substitute. Example: array('__MYKEY__' => 'MyVal', ...)
  *  @param	?Translate	$outputlangs					Output language
- *  @param	int			$converttextinhtmlifnecessary	0=Convert only value into HTML if text is already in HTML
+ *  @param	int<0,1>	$converttextinhtmlifnecessary	0=Convert only value into HTML if text is already in HTML
  *  													1=Will also convert initial $text into HTML if we try to insert one value that is HTML
  * 	@return string  		    						Output string after substitutions
  *  @see	complete_substitutions_array(), getCommonSubstitutionArray()
@@ -9736,7 +9737,7 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 						$msgishtml = 1;
 					}
 				} else {
-					$value = dol_nl2br("$value");
+					$value = dol_nl2br((string) $value);
 				}
 
 				$text = preg_replace('/__\('.preg_quote($reg[1], '/').'\)__/', $value, $text);
@@ -9767,7 +9768,7 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 					$msgishtml = 1;
 				}
 			} else {
-				$value = dol_nl2br("$value");
+				$value = dol_nl2br((string) $value);
 			}
 
 			$text = preg_replace('/__\['.preg_quote($keyfound, '/').'\]__/', $value, $text);
@@ -9785,7 +9786,7 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 		}
 
 		if (empty($converttextinhtmlifnecessary)) {
-			$text = str_replace("$key", "$value", $text); // We must keep the " to work when value is 123.5 for example
+			$text = str_replace((string) $key, (string) $value, $text); // Cast to string is needed when value is 123.5 for example
 		} else {
 			if (! $msgishtml) {
 				$valueishtml = dol_textishtml($value, 1);
@@ -9795,9 +9796,9 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 					$msgishtml = 1;
 				}
 			} else {
-				$value = dol_nl2br("$value");
+				$value = dol_nl2br((string) $value);
 			}
-			$text = str_replace("$key", "$value", $text); // We must keep the " to work when value is 123.5 for example
+			$text = str_replace((string) $key, (string) $value, $text); // Cast to string is needed 123.5 for example
 		}
 	}
 
@@ -9820,7 +9821,7 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 			if (isset($lazy_load_arr[1]) && !empty($lazy_load_arr[1])) {
 				$key_to_substitute = $lazy_load_arr[1];
 				if (preg_match('/' . preg_quote($key_to_substitute, '/') . '/', $text)) {
-					$param_arr = explode(':', $value);
+					$param_arr = explode(':', (string) $value);
 					// path:class:method:id
 					if (count($param_arr) == 4) {
 						$path = $param_arr[0];
@@ -9855,7 +9856,7 @@ function make_substitutions($text, $substitutionarray, $outputlangs = null, $con
 									$valuetouseforsubstitution = $tmpobj->$method($id, $key_to_substitute, true);
 								}
 
-								$text = str_replace("$key_to_substitute", "$valuetouseforsubstitution", $text); // We must keep the " to work when value is 123.5 for example
+								$text = str_replace((string) $key_to_substitute, (string) $valuetouseforsubstitution, $text); // Cast to string in case value is 123.5 for example
 							}
 						}
 					}
@@ -10665,9 +10666,9 @@ function dol_eval($s, $returnvalue = 1, $hideerrors = 1, $onlysimplestring = '1'
 			// Check if there is dynamic call (first we use black list patterns)
 			if (preg_match('/\$[\w]*\s*\(/', $s)) {
 				if ($returnvalue) {
-					return 'Bad string syntax to evaluate (mode '.$onlysimplestring.', found a call using of "$abc(" or "$abc (" instead of using the direct name of the function): '.$s;
+					return 'Bad string syntax to evaluate (mode '.$onlysimplestring.', found a call using "$abc(" or "$abc (" instead of using the direct name of the function): '.$s;
 				} else {
-					dol_syslog('Bad string syntax to evaluate (mode '.$onlysimplestring.', found a call using of "$abc(" or "$abc (" instead of using the direct name of the function): '.$s, LOG_WARNING);
+					dol_syslog('Bad string syntax to evaluate (mode '.$onlysimplestring.', found a call using "$abc(" or "$abc (" instead of using the direct name of the function): '.$s, LOG_WARNING);
 					return '';
 				}
 			}
