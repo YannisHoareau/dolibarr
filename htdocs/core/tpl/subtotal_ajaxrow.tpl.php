@@ -191,10 +191,11 @@ function checkLinePosition(row, inital_table) {
 
 		if (tbody[i].dataset.desc !== undefined) {
 			const currentRowLevel1 = parseInt(tbody[i].dataset.level, 10);
-			console.log(currentRowLevel1, -rowLevel, currentRowLevel1 < rowLevel);
+			console.log(currentRowLevel1, -rowLevel, currentRowLevel1 < -rowLevel);
 			if (rowLevel > 0) {
 				// Title line placement managing
-				if (currentRowLevel1 <= ignore_level) {
+				if (currentRowLevel1 <= ignore_level && ignore_level !== 0) {
+					console.log("here");
 					// continue
 				} else if (-currentRowLevel1 === rowLevel) {
 					break;
