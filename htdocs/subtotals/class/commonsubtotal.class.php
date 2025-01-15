@@ -67,8 +67,12 @@ trait CommonSubtotal
 
 		if ($depth<0) {
 			foreach ($this->lines as $line) {
-				if ($line->desc == $desc && $line->qty == -$depth) {
+				if (!$next_line && $line->desc == $desc && $line->qty == -$depth) {
 					$next_line = true;
+					continue;
+				}
+				if ($next_line && $line->desc == $desc && $line->qty == $depth) {
+					$next_line = false;
 					continue;
 				}
 				if ($next_line && $line->special_code == self::$SPECIAL_CODE && abs($line->qty) <= abs($depth)) {
