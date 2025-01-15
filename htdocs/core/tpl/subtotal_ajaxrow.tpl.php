@@ -183,15 +183,18 @@ function checkLinePosition(row, inital_table) {
 	var rowLevel = parseInt(row.dataset.level);
 	var cancelLineMove = false;
 	var found_title = rowLevel >= 0;
+	var ignore_level = 0;
 
 	for (var i = row.dataset.rang-2; i >= 0; i--) {
 
 		if (tbody[i].dataset.desc !== undefined) {
 			const currentRowLevel1 = parseInt(tbody[i].dataset.level, 10);
-			console.log(currentRowLevel1, rowLevel, currentRowLevel1 === rowLevel);
+			console.log(currentRowLevel1, -rowLevel, currentRowLevel1 < rowLevel);
 			if (rowLevel > 0) {
 				// Title line placement managing
-				if (-currentRowLevel1 === rowLevel) {
+				if (currentRowLevel1 <= ignore_level) {
+					// continue
+				} else if (-currentRowLevel1 === rowLevel) {
 					break;
 				} else if (currentRowLevel1 > 0 && currentRowLevel1 < rowLevel) {
 					if (rowLevel - currentRowLevel1 > 1) {
@@ -224,6 +227,8 @@ function checkLinePosition(row, inital_table) {
 						}
 					}
 					break;
+				} else if (currentRowLevel1 < -rowLevel) {
+					ignore_level = currentRowLevel1;
 				} else {
 					$("#notification-message").text("<?= $langs->trans("TitleUnderSameLevelOrGreater"); ?>");
 					cancelLineMove = true;
