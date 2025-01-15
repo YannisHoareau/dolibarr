@@ -767,7 +767,7 @@ if (empty($reshook)) {
 					}
 				}
 			} else {
-				$desc = GETPOST('subtotallinedesc', 'aZ09');
+				$desc = GETPOST('subtotallinedesc', 'san_alpha');
 				$depth = GETPOSTINT('subtotallinelevel') ?? 1;
 			}
 

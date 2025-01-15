@@ -1,6 +1,6 @@
 <?php
-/* Copyright (C) 2010-2012 Regis Houssin       <regis.houssin@inodbox.com>
- * Copyright (C) 2010-2016 Laurent Destailleur <eldy@users.sourceforge.net>
+/* Copyright (C) 2014-2017  Laurent Destailleur     <eldy@users.sourceforge.net>
+ * Copyright (C) 2024		MDW						<mdeweerd@users.noreply.github.com>
  * Copyright (C) 2024       Frédéric France         <frederic.france@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,10 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * or see https://www.gnu.org/
  */
 
 /**
  * Javascript code to activate the drag and drop on lines
+ * while using subtotal module
  * You can use this if you want to be able to drag and drop rows of a HTML table.
  * You must add id="tablelines" on table level tag
  * $object and $object->id must be defined
