@@ -191,7 +191,7 @@ if ($nolinesbefore) {
 	$coldisplay++;
 	?>
 	<td class="nobottom linecoldescription minwidth400imp">
-<?php
+		<?php
 		$freelines = false;
 		if (!getDolGlobalString('MAIN_DISABLE_FREE_LINES')) {
 			$freelines = true;

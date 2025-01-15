@@ -1848,10 +1848,12 @@ if (empty($reshook)) {
 				setEventMessages($langs->trans('ErrorsOnXLines', $error), null, 'errors');
 			}
 		}
-	} elseif ($action == 'applyvatforblock') {
-		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'tva');
-	} elseif ($action == 'applydiscountforblock') {
-		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'discount');
+	} elseif ($action == 'addline' && GETPOST('submitforalllines', 'alpha') && GETPOST('vatforblocklines', 'alpha') !== '' && $usercancreate) {
+		$tx_tva = GETPOST('vatforblocklines') ? GETPOST('vatforblocklines') : 0;
+		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'tva', $tx_tva);
+	} elseif ($action == 'addline' && GETPOST('submitforalllines', 'alpha') && GETPOST('discountforblocklines', 'alpha') !== '' && $usercancreate) {
+		$discount = GETPOST('discountforblocklines') ? GETPOST('discountforblocklines') : 0;
+		$object->updateSubtotalLineBlockLines($object->getRangOfLine($lineid), 'discount', $discount);
 	}
 
 	// Actions when printing a doc from card

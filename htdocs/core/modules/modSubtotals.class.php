@@ -24,7 +24,7 @@
 
 /**
  * 	  \defgroup   subtotals 	Module subtotals
- *    \brief      Module for leave/vacation management
+ *    \brief      Module for subtotal lines management
  *
  *    \file       htdocs/core/modules/modsubtotal.class.php
  *    \ingroup    subtotals
@@ -57,7 +57,7 @@ class modSubtotals extends DolibarrModules
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
-		$this->family = "hr";
+		$this->family = "technic";
 		$this->module_position = '42';
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
@@ -70,7 +70,7 @@ class modSubtotals extends DolibarrModules
 		// Name of image file used for this module.
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		$this->picto = 'holiday';
+		$this->picto = 'donation';
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/mymodule/temp");
