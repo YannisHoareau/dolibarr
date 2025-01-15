@@ -38,6 +38,7 @@ trait CommonSubtotal
 		if (!in_array($current_module, $allowed_types)) {
 			return false; // Unsupported type
 		}
+		$max_existing_level = 0;
 		$rang = -1;
 
 		if ($depth<0) {
@@ -46,6 +47,19 @@ trait CommonSubtotal
 					$rang = $line->rang+1;
 				}
 			}
+		}
+
+		if ($depth>0) {
+			foreach ($this->lines as $line) {
+				if ($line->special_code == self::$SPECIAL_CODE && $line->qty > $max_existing_level) {
+					$max_existing_level = $line->qty;
+				}
+			}
+		}
+
+		if ($max_existing_level+1 < $depth) {
+			setEventMessages("TitleLevelTooHigh", null, 'errors');
+			return 0;
 		}
 
 		// Add the line calling the right module
