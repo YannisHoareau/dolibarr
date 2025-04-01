@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture-rec.ligne.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/subtotals/class/commonsubtotal.class.php';
 
 
 /**
@@ -43,6 +44,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
  */
 class FactureFournisseurRec extends CommonInvoice
 {
+	use CommonSubtotal;
+
 	const TRIGGER_PREFIX = 'SUPPLIERBILLREC';
 	/**
 	 * @var string ID to identify managed object
@@ -493,6 +496,12 @@ class FactureFournisseurRec extends CommonInvoice
 							if ($result < 0) {
 								$error++;
 							}
+
+							$objectline->extraparams = $facfourn_line->extraparams;
+							$result = $objectline->setExtraParameters();
+							if ($result < 0) {
+								$error++;
+							}
 						} elseif ($result2 < 0) {
 							$this->errors[] = $objectline->error;
 							$error++;
@@ -857,7 +866,7 @@ class FactureFournisseurRec extends CommonInvoice
 				$line->import_key               = $objp->import_key;
 				$line->fk_user_author           = $objp->fk_user_author;
 				$line->fk_user_modif            = $objp->fk_user_modif;
-				$this->extraparams 				= !empty($objp->extraparams) ? (array) json_decode($objp->extraparams, true) : array();
+				$line->extraparams 				= !empty($objp->extraparams) ? (array) json_decode($objp->extraparams, true) : array();
 				$line->fk_multicurrency         = $objp->fk_multicurrency;
 				$line->multicurrency_code       = $objp->multicurrency_code;
 				$line->multicurrency_subprice   = $objp->multicurrency_subprice;

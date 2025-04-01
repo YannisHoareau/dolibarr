@@ -99,8 +99,11 @@ if ($line->qty > 0) { ?>
 		}
 		?>
 	</td>
-	<td class="linecoluht"></td>
 	<?php
+	// Handling create a rec fourn fact
+	if (GETPOST('action', 'alpha') != 'create') {
+		print '<td class="linecoluht"></td>';
+	}
 	if (isModEnabled("multicurrency") && $this->multicurrency_code != $conf->currency) {
 		print '<td class="linecoluht_currency"></td>';
 	}
@@ -168,6 +171,11 @@ if ($line->qty > 0) { ?>
 	// Handling colspan if the current object is a supplier proposal
 	if (in_array($object->element, array('supplier_proposal', 'order_supplier', 'invoice_supplier'))) {
 		$colspan += 1;
+	}
+
+	// Handling create a rec fourn fact
+	if (GETPOST('action', 'alpha') == 'create') {
+		$colspan -= 1;
 	}
 
 	// Handling colspan if margin module is enabled
