@@ -362,11 +362,50 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 				$curY = $tab_top + 7;
 				$nexY = $tab_top + 7;
 
+				$pdf_sub_options = array();
+				$pdf_sub_options['titleshowuponpdf'] = 1;
+				$pdf_sub_options['titleshowtotalexludingvatonpdf'] = 1;
+
 				// Loop on each lines
 				for ($i = 0; $i < $nblines; $i++) {
 					$curY = $nexY;
 					$pdf->SetFont('', '', $default_font_size - 1); // Into loop to work with multipage
 					$pdf->SetTextColor(0, 0, 0);
+
+					$sub_options = $object->lines[$i]->extraparams["subtotal"] ?? array();
+
+					if ($object->lines[$i]->special_code == SUBTOTALS_SPECIAL_CODE) {
+						$level = $object->lines[$i]->qty;
+						if ($sub_options) {
+							if (isset($sub_options['titleshowuponpdf'])) {
+								$pdf_sub_options['titleshowuponpdf'] = isset($pdf_sub_options['titleshowuponpdf']) && $pdf_sub_options['titleshowuponpdf'] < $level ? $pdf_sub_options['titleshowuponpdf'] : $level;
+							} elseif (isset($pdf_sub_options['titleshowuponpdf']) && abs($level) <= $pdf_sub_options['titleshowuponpdf']) {
+								unset($pdf_sub_options['titleshowuponpdf']);
+							}
+							if (isset($sub_options['titleshowtotalexludingvatonpdf'])) {
+								$pdf_sub_options['titleshowtotalexludingvatonpdf'] = isset($pdf_sub_options['titleshowtotalexludingvatonpdf']) && $pdf_sub_options['titleshowtotalexludingvatonpdf'] < $level ? $pdf_sub_options['titleshowtotalexludingvatonpdf'] : $level;
+							} elseif (isset($pdf_sub_options['titleshowtotalexludingvatonpdf']) && abs($level) <= $pdf_sub_options['titleshowtotalexludingvatonpdf']) {
+								unset($pdf_sub_options['titleshowtotalexludingvatonpdf']);
+							}
+						} else {
+							if (isset($pdf_sub_options['titleshowuponpdf']) && abs($level) <= $pdf_sub_options['titleshowuponpdf']) {
+								unset($pdf_sub_options['titleshowuponpdf']);
+							}
+							if (isset($pdf_sub_options['titleshowtotalexludingvatonpdf']) && abs($level) <= $pdf_sub_options['titleshowtotalexludingvatonpdf']) {
+								unset($pdf_sub_options['titleshowtotalexludingvatonpdf']);
+							}
+						}
+					}
+
+					if (($curY + 6) > ($this->page_hauteur - $heightforfooter) || isset($sub_options['titleforcepagebreak']) && !($pdf->getNumPages() == 1 && $curY == $tab_top + $this->tabTitleHeight)) {
+						$pdf->AddPage();
+						if (!empty($tplidx)) {
+							$pdf->useTemplate($tplidx);
+						}
+
+						$pdf->setPage($pdf->getNumPages());
+						$nexY = $curY = $tab_top_newpage;
+					}
 
 					// Define size of image if we need it
 					//$imglinesize = array();
@@ -384,8 +423,27 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 					// Description of product line
 					$curX = $this->posxdesc - 1;
 
+
+					if ($object->lines[$i]->special_code == SUBTOTALS_SPECIAL_CODE) {
+						$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
+						$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
+						$pdf->SetXY($pdf->GetX() + 1, $curY);
+						$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 4, '', 0, 'R', true);
+						$previous_align = array();
+						$previous_align['align'] = $this->cols['desc']['content']['align'] ?? 'L';
+						if ($object->lines[$i]->qty < 0) {
+							$langs->load("subtotals");
+							$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
+							if ($previous_align['align'] == 'L') {
+								$this->cols['desc']['content']['align'] = 'R';
+							} elseif ($previous_align['align'] == 'R') {
+								$this->cols['desc']['content']['align'] = 'L';
+							}
+						}
+
+					}
 					$pdf->startTransaction();
-					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxtva - $curX, 3, $curX, $curY, $hideref, $hidedesc, 1);
+					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxtva - $curX, 3, $curX, $curY, $hideref, $hidedesc, 1, $this->cols['desc']['content']['align'] ?? 'J');
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) {	// There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -418,6 +476,7 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 						$pdf->commitTransaction();
 					}
 					$posYAfterDescription = $pdf->GetY();
+					$this->cols['desc']['content']['align'] = $previous_align['align'] ?? ''; // Re align if we printed a subtotal ligne
 
 					$nexY = $pdf->GetY();
 					$pageposafter = $pdf->getPage();
@@ -434,38 +493,52 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 					$pdf->SetFont('', '', $default_font_size - 1); // We reposition the default font
 
 					// VAT Rate
-					if (!getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT')) {
+					if (!getDolGlobalString('MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT') && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
 						$pdf->SetXY($this->posxtva, $curY);
 						$pdf->MultiCell($this->posxup - $this->posxtva - 1, 3, $vat_rate, 0, 'R');
 					}
 
 					// Unit price before discount
-					$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
-					$pdf->SetXY($this->posxup, $curY);
-					$pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 3, $up_excl_tax, 0, 'R', false);
+					if ($object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE && isset($pdf_sub_options['titleshowuponpdf'])) {
+						$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
+						$pdf->SetXY($this->posxup, $curY);
+						$pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 3, $up_excl_tax, 0, 'R', false);
+					}
 
 					// Quantity
-					$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
-					$pdf->SetXY($this->posxqty, $curY);
-					$pdf->MultiCell($this->posxunit - $this->posxqty - 0.8, 4, $qty, 0, 'R'); // Enough for 6 chars
+					if ($object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
+						$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
+						$pdf->SetXY($this->posxqty, $curY);
+						$pdf->MultiCell($this->posxunit - $this->posxqty - 0.8, 4, $qty, 0, 'R'); // Enough for 6 chars
+					}
 
 					// Unit
-					if (getDolGlobalInt('PRODUCT_USE_UNITS')) {
+					if (getDolGlobalInt('PRODUCT_USE_UNITS') && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE ) {
 						$unit = pdf_getlineunit($object, $i, $outputlangs, $hidedetails);
 						$pdf->SetXY($this->posxunit, $curY);
 						$pdf->MultiCell($this->posxdiscount - $this->posxunit - 0.8, 4, $unit, 0, 'L');
 					}
 
 					// Discount on line
-					if ($object->lines[$i]->remise_percent) {
+					if ($object->lines[$i]->remise_percent && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
 						$pdf->SetXY($this->posxdiscount - 2, $curY);
 						$remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails);
 						$pdf->MultiCell($this->postotalht - $this->posxdiscount - 1, 3, $remise_percent, 0, 'R');
 					}
 
 					// Total HT line
-					$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+					if ($object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE && isset($pdf_sub_options['titleshowtotalexludingvatonpdf'])) {
+						$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+					} elseif ($object->lines[$i]->qty < 0 && isset($sub_options['subtotalshowtotalexludingvatonpdf'])) {
+						if (isModEnabled('multicurrency') && $object->multicurrency_code != $conf->currency) {
+							$total_excl_tax = $object->getSubtotalLineMulticurrencyAmount($object->lines[$i]);
+						} else {
+							$total_excl_tax = $object->getSubtotalLineAmount($object->lines[$i]);
+						}
+					} else {
+						$total_excl_tax = '';
+					}
 					$pdf->SetXY($this->postotalht, $curY);
 					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 3, $total_excl_tax, 0, 'R', false);
 
