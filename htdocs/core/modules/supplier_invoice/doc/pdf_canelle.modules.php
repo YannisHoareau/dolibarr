@@ -440,7 +440,6 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 								$this->cols['desc']['content']['align'] = 'L';
 							}
 						}
-
 					}
 					$pdf->startTransaction();
 					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxtva - $curX, 3, $curX, $curY, $hideref, $hidedesc, 1, $this->cols['desc']['content']['align'] ?? 'J');
