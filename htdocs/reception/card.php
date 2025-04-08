@@ -386,6 +386,7 @@ if (empty($reshook)) {
 				$idl = "idl".$i;	// id line source
 				$lineToTest = '';
 				$lineId = GETPOSTINT($idl);
+				$subtotal_line = null;
 				foreach ($objectsrc->lines as $linesrc) {
 					if (isModEnabled('subtotals') && $linesrc->special_code == SUBTOTALS_SPECIAL_CODE && $linesrc->id == $lineId) {
 						foreach ($selected_subtotal_lines as $key => $id) {
@@ -418,8 +419,7 @@ if (empty($reshook)) {
 				//if (GETPOST($qty, 'int') > 0 || (GETPOST($qty, 'int') == 0 && getDolGlobalString('RECEPTION_GETS_ALL_ORDER_PRODUCTS')) || (GETPOST($qty, 'int') < 0 && getDolGlobalString('RECEPTION_ALLOW_NEGATIVE_QTY'))) {
 
 				if (isModEnabled('subtotals') && isset($subtotal_line) && $subtotal_line->special_code == SUBTOTALS_SPECIAL_CODE) {
-					$ret = $object->addSubtotalLine($langs, $subtotal_line->desc, (int)$subtotal_line->qty, $subtotal_line->extraparams, $subtotal_line->id);
-					$subtotal_line = null;
+					$ret = $object->addSubtotalLine($langs, $subtotal_line->desc, (int) $subtotal_line->qty, $subtotal_line->extraparams, $subtotal_line->id);
 					continue;
 				}
 				if (GETPOSTFLOAT($qty) > 0 || (GETPOSTFLOAT($qty) == 0 && getDolGlobalString('RECEPTION_GETS_ALL_ORDER_PRODUCTS'))) {

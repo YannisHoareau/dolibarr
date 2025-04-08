@@ -3,7 +3,7 @@
 /**
  * @var CommonObject $object
  * @var CommonObjectLine $objp
- * @var CommonObjectLine $lines
+ * @var array<CommonObjectLine> $lines
  * @var Translate $langs
  *
  * @var int $i
@@ -11,16 +11,20 @@
  */
 
 '
-@phan-var-force CommonObjectLine|CommonOrderLine|ExpeditionLigne $line
-@phan-var-force Commande|Expedition $object
+@phan-var-force CommonObjectLine|CommandeFournisseurLigne|ReceptionLineBatch $line
+@phan-var-force array<CommonObjectLine,CommandeFournisseurLigne,ReceptionLineBatch> $lines
+@phan-var-force CommandeFournisseur|Expedition $object
+@phan-var-force string $suffix
 ';
+
+
 
 if (!empty($objp)) {
 	$id = $objp->rowid;
 	print '<!-- subtotal dispatch line id = ' . $id . ' -->';
 	$element = "commande";
 	$desc = $objp->description;
-	$extraparams = (array)json_decode($objp->extraparams, true);
+	$extraparams = (array) json_decode($objp->extraparams, true);
 	$line_options = $extraparams["subtotal"] ?? array();
 	$qty = $objp->qty;
 } else {
@@ -28,7 +32,7 @@ if (!empty($objp)) {
 	print '<!-- subtotal reception line id = ' . $id . ' -->';
 	$element = "commande";
 	$desc = $lines[$i]->description;
-	$line_options = (array)$lines[$i]->extraparams["subtotal"];
+	$line_options = (array) $lines[$i]->extraparams["subtotal"];
 	$qty = $lines[$i]->qty;
 	$buttons = true;
 }

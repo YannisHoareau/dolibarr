@@ -6,6 +6,13 @@
  * @var CommonObjectLine $line
  * @var int $indiceAsked
  */
+
+'
+@phan-var-force CommonObjectLine|CommandeFournisseurLigne|ReceptionLineBatch $line
+@phan-var-force CommandeFournisseur|Expedition $object
+@phan-var-force string $indiceAsked
+';
+
 $line_color = $object->getSubtotalColors($line['level']);
 
 print '<!-- line for order line '.$line['id'].' -->'."\n";
