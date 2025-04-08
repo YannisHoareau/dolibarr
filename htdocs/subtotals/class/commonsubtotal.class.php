@@ -72,7 +72,7 @@ trait CommonSubtotal
 		}
 		$current_module = $this->element;
 		// Ensure the object is one of the supported types
-		$allowed_types = array('propal', 'commande', 'facture', 'facturerec', 'shipping', 'supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec');
+		$allowed_types = array('propal', 'commande', 'facture', 'facturerec', 'shipping', 'supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec', 'reception');
 		if (!in_array($current_module, $allowed_types)) {
 			if (isset($this->errors)) {
 				$this->errors[] = $langs->trans("UnsupportedModuleError");
@@ -85,7 +85,7 @@ trait CommonSubtotal
 		$next_line = false;
 		$result = 0;
 
-		if ($depth < 0 && $current_module != 'shipping') {
+		if ($depth < 0 && !in_array($current_module, array('shipping', 'reception'))) {
 			foreach ($this->lines as $line) {
 				if (!$next_line && $line->desc == $desc && $line->qty == -$depth) {
 					$next_line = true;
@@ -102,7 +102,7 @@ trait CommonSubtotal
 			}
 		}
 
-		if ($depth > 0 && $current_module != 'shipping') {
+		if ($depth > 0 && !in_array($current_module, array('shipping', 'reception'))) {
 			$max_existing_level = 0;
 
 			foreach ($this->lines as $line) {
@@ -298,9 +298,15 @@ trait CommonSubtotal
 				$rang					// Rang @phpstan-ignore-line
 			);
 			$this->fetch_lines();
+		} elseif ($current_module == 'reception') {
+			$result = $this->addline( // @phpstan-ignore-line
+				'',						// Warehouse ID @phpstan-ignore-line
+				(int) $parent_line,		// Source line @phpstan-ignore-line
+				$depth					// Quantity @phpstan-ignore-line
+			);
 		}
 
-		if ($current_module != 'shipping') {
+		if (!in_array($current_module, array('shipping', 'reception'))) {
 			foreach ($this->lines as $line) {
 				'@phan-var-force CommonObjectLine $line';
 				if ($line->id == $result) {
@@ -334,7 +340,7 @@ trait CommonSubtotal
 	{
 		$current_module = $this->element;
 		// Ensure the object is one of the supported types
-		$allowed_types = array('propal', 'commande', 'facture', 'facturerec', 'shipping', 'supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec');
+		$allowed_types = array('propal', 'commande', 'facture', 'facturerec', 'shipping', 'supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec', 'reception');
 		if (!in_array($current_module, $allowed_types)) {
 			if (isset($this->errors)) {
 				$this->errors[] = $langs->trans("UnsupportedModuleError");
@@ -382,6 +388,10 @@ trait CommonSubtotal
 			$result = $line->delete($user); // @phpstan-ignore-line
 		} elseif ($current_module == 'shipping') {
 			$line = new ExpeditionLigne($this->db);
+			$line->id = $id;
+			$result = $line->delete($user); // @phpstan-ignore-line
+		} elseif ($current_module == 'reception') {
+			$line = new ReceptionLineBatch($this->db);
 			$line->id = $id;
 			$result = $line->delete($user); // @phpstan-ignore-line
 		}

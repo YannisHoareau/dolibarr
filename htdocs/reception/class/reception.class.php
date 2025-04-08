@@ -43,7 +43,7 @@ if (isModEnabled("propal")) {
 if (isModEnabled('order')) {
 	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 }
-
+require_once DOL_DOCUMENT_ROOT.'/subtotals/class/commonsubtotal.class.php';
 
 /**
  *	Class to manage receptions
@@ -51,6 +51,7 @@ if (isModEnabled('order')) {
 class Reception extends CommonObject
 {
 	use CommonIncoterm;
+	use CommonSubtotal;
 
 	/**
 	 * @var string code
@@ -1258,7 +1259,7 @@ class Reception extends CommonObject
 
 		require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.commande.dispatch.class.php';
 
-		$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."receptiondet_batch";
+		$sql = "SELECT rowid, extraparams FROM ".MAIN_DB_PREFIX."receptiondet_batch";
 		$sql .= " WHERE fk_reception = ".((int) $this->id);
 
 		$resql = $this->db->query($sql);
@@ -1267,12 +1268,14 @@ class Reception extends CommonObject
 			while ($obj = $this->db->fetch_object($resql)) {
 				$line = new CommandeFournisseurDispatch($this->db);
 
+				$extraparams = (array) json_decode($obj->extraparams);
+
 				$line->fetch($obj->rowid);
 
 				// TODO Remove or keep this ?
 				$line->fetch_product();
 
-				$sql_commfourndet = 'SELECT qty, ref, label, description, tva_tx, vat_src_code, subprice, multicurrency_subprice, remise_percent, total_ht, total_ttc, total_tva';
+				$sql_commfourndet = 'SELECT qty, ref, label, description, tva_tx, vat_src_code, subprice, multicurrency_subprice, remise_percent, total_ht, total_ttc, total_tva, special_code';
 				$sql_commfourndet .= ' FROM '.MAIN_DB_PREFIX.'commande_fournisseurdet';
 				$sql_commfourndet .= ' WHERE rowid = '.((int) $line->fk_commandefourndet);
 				$sql_commfourndet .= ' ORDER BY rang';
@@ -1293,6 +1296,8 @@ class Reception extends CommonObject
 					$line->total_ht = $obj->total_ht;
 					$line->total_ttc = $obj->total_ttc;
 					$line->total_tva = $obj->total_tva;
+					$line->special_code = $obj->special_code;
+					$line->extraparams = $extraparams;
 				} else {
 					$line->qty_asked = 0;
 					$line->description = '';

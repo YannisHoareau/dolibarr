@@ -701,7 +701,7 @@ if ($id > 0 || !empty($ref)) {
 		}
 
 		//$sql = "SELECT l.rowid, l.fk_product, l.subprice, l.remise_percent, l.ref AS sref, SUM(l.qty) as qty,";
-		$sql = "SELECT l.rowid, l.fk_product, l.subprice, l.remise_percent, l.ref AS sref, l.qty as qty,";
+		$sql = "SELECT l.description, l.rowid, l.fk_product, l.subprice, l.remise_percent, l.ref AS sref, l.qty as qty, l.special_code, l.extraparams,";
 		$sql .= " p.ref, p.label, p.tobatch, p.fk_default_warehouse";
 
 		// Enable hooks to alter the SQL query (SELECT)
@@ -817,8 +817,11 @@ if ($id > 0 || !empty($ref)) {
 				$objp = $db->fetch_object($resql);
 
 				// On n'affiche pas les produits libres
-				if (!$objp->fk_product > 0) {
+				if (!$objp->fk_product > 0 && $objp->special_code != SUBTOTALS_SPECIAL_CODE) {
 					$nbfreeproduct++;
+				} elseif ($objp->special_code == SUBTOTALS_SPECIAL_CODE) {
+					$suffix = '_0_'.$i;
+					require dol_buildpath('/core/tpl/subtotal_reception_view.tpl.php');
 				} else {
 					$alreadydispatched = isset($products_dispatched[$objp->rowid]) ? $products_dispatched[$objp->rowid] : 0;
 					$remaintodispatch = price2num($objp->qty - ((float) $alreadydispatched), 5); // Calculation of dispatched

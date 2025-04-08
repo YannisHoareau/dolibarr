@@ -232,8 +232,16 @@ class ReceptionLineBatch extends CommonObjectLine
 			$this->datec = dol_now();
 		}
 
+		$is_subtotal_line = false;
+
+		if (isModEnabled('subtotals')) {
+			$objectsrc = new CommandeFournisseurLigne($this->db);
+			$objectsrc->fetch($this->fk_elementdet);
+			$is_subtotal_line = $objectsrc->special_code == SUBTOTALS_SPECIAL_CODE;
+		}
+
 		// Check parameters
-		if (empty($this->fk_product)) {
+		if (empty($this->fk_product) && !$is_subtotal_line) {
 			$this->error = 'Error, property ->fk_product must not be empty to create a line of reception';
 			return -1;
 		}

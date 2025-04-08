@@ -379,6 +379,7 @@ if (empty($reshook)) {
 			$array_options[$i] = $extrafields->getOptionalsFromPost($object->table_element_line, (string) $i);
 		}
 
+		$selected_subtotal_lines = GETPOST('subtotal_toselect', 'array');
 
 		if ($totalqty > 0) {  // There is at least one thing to ship
 			for ($i = 1; $i <= $num; $i++) {
@@ -386,6 +387,16 @@ if (empty($reshook)) {
 				$lineToTest = '';
 				$lineId = GETPOSTINT($idl);
 				foreach ($objectsrc->lines as $linesrc) {
+					if (isModEnabled('subtotals') && $linesrc->special_code == SUBTOTALS_SPECIAL_CODE && $linesrc->id == $lineId) {
+						foreach ($selected_subtotal_lines as $key => $id) {
+							if ($lineId == $id) {
+								$subtotal_line = $linesrc;
+								$lineToTest = $linesrc;
+								break;
+							}
+						}
+						break;
+					}
 					if ($linesrc->id == $lineId) {
 						$lineToTest = $linesrc;
 						break;
@@ -405,6 +416,12 @@ if (empty($reshook)) {
 				//var_dump(GETPOST("productl".$i, 'int').' '.GETPOST('entl'.$i, 'int').' '.GETPOST($idl, 'int').' '.GETPOST($qty, 'int').' '.GETPOST($batch, 'alpha'));
 
 				//if (GETPOST($qty, 'int') > 0 || (GETPOST($qty, 'int') == 0 && getDolGlobalString('RECEPTION_GETS_ALL_ORDER_PRODUCTS')) || (GETPOST($qty, 'int') < 0 && getDolGlobalString('RECEPTION_ALLOW_NEGATIVE_QTY'))) {
+
+				if (isModEnabled('subtotals') && isset($subtotal_line) && $subtotal_line->special_code == SUBTOTALS_SPECIAL_CODE) {
+					$ret = $object->addSubtotalLine($langs, $subtotal_line->desc, (int)$subtotal_line->qty, $subtotal_line->extraparams, $subtotal_line->id);
+					$subtotal_line = null;
+					continue;
+				}
 				if (GETPOSTFLOAT($qty) > 0 || (GETPOSTFLOAT($qty) == 0 && getDolGlobalString('RECEPTION_GETS_ALL_ORDER_PRODUCTS'))) {
 					$ent = "entl".$i;
 					$idl = "idl".$i;
@@ -455,6 +472,15 @@ if (empty($reshook)) {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$error++;
 				} else {
+					foreach ($object->lines as $line) {
+						foreach ($objectsrc->lines as $linesrc) {
+							if ($linesrc->id == $line->fk_elementdet) {
+								$line->extraparams = $linesrc->extraparams;
+								$line->setExtraParameters();
+								break;
+							}
+						}
+					}
 					// Define output language
 					if (!getDolGlobalString('MAIN_DISABLE_PDF_AUTOUPDATE')) {
 						$object->fetch_thirdparty();
@@ -541,6 +567,32 @@ if (empty($reshook)) {
 			if ($result < 0) {
 				setEventMessages($object->error, $object->errors, 'errors');
 		}*/
+	} elseif ($action == 'confirm_delete_subtotalline' && $confirm == 'yes' && $permissiontoadd) {
+		$result = $object->deleteSubtotalLine($langs, GETPOSTINT('lineid'), (bool) GETPOST('deletecorrespondingsubtotalline'), $user);
+		if ($result > 0) {
+			// Define output language
+			$outputlangs = $langs;
+			$newlang = '';
+			if (getDolGlobalInt('MAIN_MULTILANGS') /* && empty($newlang) */ && GETPOST('lang_id', 'aZ09')) {
+				$newlang = GETPOST('lang_id', 'aZ09');
+			}
+			if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang)) {
+				$newlang = $object->thirdparty->default_lang;
+			}
+			if (!empty($newlang)) {
+				$outputlangs = new Translate("", $conf);
+				$outputlangs->setDefaultLang($newlang);
+			}
+			if (!getDolGlobalString('MAIN_DISABLE_PDF_AUTOUPDATE')) {
+				$ret = $object->fetch($object->id); // Reload to get new records
+				$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
+			}
+
+			header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
+			exit;
+		} else {
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
 	} elseif ($action == 'setdate_livraison' && $permissiontoadd) {
 		$datedelivery = dol_mktime(GETPOSTINT('liv_hour'), GETPOSTINT('liv_min'), 0, GETPOSTINT('liv_month'), GETPOSTINT('liv_day'), GETPOSTINT('liv_year'));
 
@@ -1073,6 +1125,31 @@ if ($action == 'create') {
 					$fk_commandefourndet = 'fk_commandefournisseurdet'.$paramSuffix;
 					$dispatchLines[$numAsked] = array('prod' => GETPOSTINT($prod), 'qty' => price2num(GETPOST($qty), 'MS'), 'ent' => GETPOSTINT($ent), 'pu' => price2num(GETPOST($pu), 'MU'), 'comment' => GETPOST($comment), 'fk_commandefourndet' => GETPOSTINT($fk_commandefourndet), 'DLC' => $dDLC, 'DLUO' => $dDLUO, 'lot' => GETPOSTINT($lot));
 				}
+
+				if (preg_match('/^subtotal_([0-9]+)_([0-9]+)$/i', $key, $reg)) {
+					$numAsked++;
+					$paramSuffix = $reg[1] . '_' . $reg[2];
+					$suffix2numAsked[$paramSuffix] = $numAsked;
+
+					$numline = $numAsked;
+
+					$dispatchLines[$numAsked] = array(
+						'subtotal' => $reg[2],
+						'id' => (int) GETPOST('id_'.$paramSuffix),
+						'description' => GETPOST('description_'.$paramSuffix),
+						'level' => (int) GETPOST('subtotal_'.$paramSuffix)
+					);
+
+					if (GETPOST('titleshowuponpdf_'.$paramSuffix)) {
+						$dispatchLines[$numAsked]['titleshowuponpdf'] = 1;
+					}
+					if (GETPOST('titleshowtotalexludingvatonpdf_'.$paramSuffix)) {
+						$dispatchLines[$numAsked]['titleshowtotalexludingvatonpdf'] = 1;
+					}
+					if (GETPOST('titleforcepagebreak_'.$paramSuffix)) {
+						$dispatchLines[$numAsked]['titleforcepagebreak'] = 1;
+					}
+				}
 			}
 
 			// If extrafield values are passed in the HTTP query, assign them to the correct dispatch line
@@ -1111,8 +1188,21 @@ if ($action == 'create') {
 			$objectsrc->loadReceptions();
 
 			if ($numAsked) {
+				if (isModEnabled('subtotals')) {
+					foreach ($dispatchLines as $line) {
+						if (array_key_exists('subtotal', $line)) {
+							$show_check_add_buttons = true;
+							break;
+						}
+					}
+				}
 				print '<tr class="liste_titre">';
-				print '<td>'.$langs->trans("Description").'</td>';
+				print '<td>';
+				if (isset($show_check_add_buttons)) {
+					print $form->showCheckAddButtons('checkforselect');
+				}
+				print $langs->trans("Description");
+				print '</td>';
 				print '<td>'.$langs->trans("Comment").'</td>';
 				print '<td class="center">'.$langs->trans("QtyOrdered").'</td>';
 				print '<td class="center">'.$langs->trans("QtyReceived").'</td>';
@@ -1149,6 +1239,13 @@ if ($action == 'create') {
 			$indiceAsked = 1;
 			while ($indiceAsked <= $numAsked) {	// Loop on $dispatchLines. Warning: $dispatchLines must be sorted by fk_commandefourndet (it is a regroupment key on output)
 				$product = new Product($db);
+
+				if (array_key_exists('subtotal', $dispatchLines[$indiceAsked])) {
+					$line = $dispatchLines[$indiceAsked];
+					require dol_buildpath('/core/tpl/subtotal_reception_select.tpl.php');
+					$indiceAsked++;
+					continue;
+				}
 
 				// We search the purchase order line that is linked to the dispatchLines
 				foreach ($objectsrc->lines as $supplierLine) {
@@ -1414,6 +1511,20 @@ if ($action == 'create') {
 	// Confirm deletion
 	if ($action == 'delete') {
 		$formconfirm = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('DeleteReception'), $langs->trans("ConfirmDeleteReception", $object->ref), 'confirm_delete', '', 0, 1);
+	}
+
+	// Confirmation de la suppression d'une ligne subtotal
+	if ($action == 'ask_subtotal_deleteline') {
+		$lineid = GETPOSTINT('lineid');
+		$langs->load("subtotals");
+		$title = "DeleteSubtotalLine";
+		$question = "ConfirmDeleteSubtotalLine";
+		if (GETPOST('type') == 'title') {
+			$formconfirm = array(array('type' => 'checkbox', 'name' => 'deletecorrespondingsubtotalline', 'label' => $langs->trans("DeleteCorrespondingSubtotalLine"), 'value' => 0));
+			$title = "DeleteTitleLine";
+			$question = "ConfirmDeleteTitleLine";
+		}
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans($title), $langs->trans($question), 'confirm_delete_subtotalline', $formconfirm, 'no', 1);
 	}
 
 	// Confirmation validation
@@ -1898,6 +2009,10 @@ if ($action == 'create') {
 	// Loop on each product to send/sent. Warning: $lines must be sorted by ->fk_commandefourndet (it is a regroupment key on output)
 	print '<tbody>';
 	for ($i = 0; $i < $num_prod; $i++) {
+		if ($lines[$i]->special_code == SUBTOTALS_SPECIAL_CODE) {
+			require dol_buildpath('/core/tpl/subtotal_reception_view.tpl.php');
+			continue;
+		}
 		print '<!-- origin line id = '.(!empty($lines[$i]->origin_line_id) ? $lines[$i]->origin_line_id : 0).' -->'; // id of order line
 		print '<tr class="oddeven" id="row-'.$lines[$i]->id.'" data-id="'.$lines[$i]->id.'" data-element="'.$lines[$i]->element.'">';
 
