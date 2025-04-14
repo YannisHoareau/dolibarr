@@ -3,12 +3,12 @@
 /**
  * @var CommonObject $object
  * @var CommonObject $this
- * @var CommonObjectLine $line
+ * @var array<CommonObjectLine> $line
  * @var int $indiceAsked
  */
 
 '
-@phan-var-force CommonObjectLine|CommandeFournisseurLigne|ReceptionLineBatch $line
+@phan-var-force array<CommonObjectLine,CommandeFournisseurLigne,ReceptionLineBatch> $line
 @phan-var-force CommandeFournisseur|Expedition $object
 @phan-var-force string $indiceAsked
 ';
