@@ -32,7 +32,11 @@ if (!empty($objp)) {
 	print '<!-- subtotal reception line id = ' . $id . ' -->';
 	$element = "commande";
 	$desc = $lines[$i]->description;
-	$line_options = (array) $lines[$i]->extraparams["subtotal"];
+	$line_options = array();
+	if (key_exists('subtotal', $lines[$i]->extraparams)) {
+		$line_options = (array) $lines[$i]->extraparams["subtotal"];
+	}
+
 	$qty = $lines[$i]->qty;
 	$buttons = true;
 }
