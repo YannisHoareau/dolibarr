@@ -147,6 +147,15 @@ if ($line->qty > 0) { ?>
 		?>
 	</td>
 	<?php
+	// Handling if situation invoices conf is enabled
+	if (isset($this->situation_cycle_ref) && $this->situation_cycle_ref) {
+		print '<td class="linecolcycleref nowrap right"></td>';
+		if (getDolGlobalInt('INVOICE_USE_SITUATION') == 2) {
+			print '<td  class="nowrap right"></td>';
+		}
+		print '<td class="linecolcycleref2 right nowrap"></td>';
+	}
+
 	// Handling colspan if margin module is enabled
 	if (!empty($object->element) && in_array($object->element, array('facture', 'facturerec', 'propal', 'commande')) && isModEnabled('margin') && empty($user->socid)) {
 		if ($user->hasRight('margins', 'creer')) {
@@ -176,6 +185,13 @@ if ($line->qty > 0) { ?>
 	// Handling create a rec fourn fact
 	if (GETPOST('action', 'alpha') == 'create') {
 		$colspan -= 1;
+	}
+
+	if (isset($this->situation_cycle_ref) && $this->situation_cycle_ref) {
+		$colspan += 2;
+		if (getDolGlobalInt('INVOICE_USE_SITUATION') == 2) {
+			$colspan += 1;
+		}
 	}
 
 	// Handling colspan if margin module is enabled
@@ -208,7 +224,7 @@ if ($line->qty > 0) { ?>
 	?>
 	<td class="linecollabel nowrap right" <?php echo !colorIsLight($line_color) ? ' style="color: white"' : ' style="color: black"' ?> colspan="<?php echo $colspan + 2 ?>">
 		<?php
-		echo $line_description;
+		echo $line->desc;
 		if (array_key_exists('subtotalshowtotalexludingvatonpdf', $line_options)) {
 			echo '&nbsp; <span title="' . $langs->trans("ShowTotalExludingVATOnPDF") . '">%</span>';
 		}
