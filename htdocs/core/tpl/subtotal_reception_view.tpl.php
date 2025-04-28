@@ -33,7 +33,7 @@ if (!empty($objp)) {
 	$element = "commande";
 	$desc = $lines[$i]->description;
 	$line_options = array();
-	if (key_exists('subtotal', $lines[$i]->extraparams)) {
+	if (array_key_exists('subtotal', $lines[$i]->extraparams)) {
 		$line_options = (array) $lines[$i]->extraparams["subtotal"];
 	}
 
