@@ -44,8 +44,11 @@ if (!empty($objp)) {
 $langs->load('subtotals');
 
 $line_color = $object->getSubtotalColors((int) $qty);
-$colspan = 9;
+$colspan = 8;
 
+if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) {
+	$colspan++;
+}
 if (isModEnabled('productbatch')) {
 	$colspan++;
 }
