@@ -38,7 +38,7 @@ if (!empty($objp)) {
 	}
 
 	$qty = $lines[$i]->qty;
-	$buttons = true;
+	$buttons = $object->status == Reception::STATUS_DRAFT;
 }
 
 $langs->load('subtotals');
@@ -96,7 +96,7 @@ if ($qty > 0) { ?>
 </td>
 <?php }
 
-if (isset($buttons)) {
+if (isset($buttons) && $buttons) {
 	// Delete picto
 	echo '<td class="linecoldelete center">';
 	echo '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=ask_subtotal_deleteline&token=' . newToken() . '&lineid=' . $id;
