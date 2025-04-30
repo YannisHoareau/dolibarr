@@ -746,6 +746,74 @@ trait CommonSubtotal
 						$this->lines[$i]->fk_unit, // @phpstan-ignore-line
 						$this->lines[$i]->multicurrency_subprice // @phpstan-ignore-line
 					);
+				} elseif ($current_module == 'supplier_proposal') {
+					$result = $this->updateline( // @phpstan-ignore-line
+						$this->lines[$i]->id, 												// ID of line to change @phpstan-ignore-line
+						$this->lines[$i]->subprice,											// Unit price @phpstan-ignore-line
+						$this->lines[$i]->qty,												// Quantity @phpstan-ignore-line
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,	// Discount percentage @phpstan-ignore-line
+						$mode == 'tva' ? $value : $this->lines[$i]->tva_tx,					// VAT rate @phpstan-ignore-line
+						$this->lines[$i]->localtax1_rate,									// Local tax 1 @phpstan-ignore-line
+						$this->lines[$i]->localtax2_rate,									// Local tax 2 @phpstan-ignore-line
+						$this->lines[$i]->desc,												// Description @phpstan-ignore-line
+						'HT',																// Price base type @phpstan-ignore-line
+						$this->lines[$i]->info_bits,										// Info bits @phpstan-ignore-line
+						$this->lines[$i]->special_code,										// Special code @phpstan-ignore-line
+						$this->lines[$i]->fk_parent_line, 									// FK parent line @phpstan-ignore-line
+						0, 																	// Skip update total @phpstan-ignore-line
+						$this->lines[$i]->fk_fournprice, 									// FK fournprice @phpstan-ignore-line
+						$this->lines[$i]->pa_ht, 											// PA ht @phpstan-ignore-line
+						$this->lines[$i]->label,											// Label @phpstan-ignore-line
+						$this->lines[$i]->product_type,										// Type @phpstan-ignore-line
+						$this->lines[$i]->array_options,									// Array of options @phpstan-ignore-line
+						$this->lines[$i]->ref_fourn,										// Ref fourn @phpstan-ignore-line
+						$this->lines[$i]->fk_unit,											// FK unit @phpstan-ignore-line
+						$this->lines[$i]->multicurrency_subprice							// Unit price in currency @phpstan-ignore-line
+					);
+				} elseif ($current_module == 'order_supplier') {
+					$result = $this->updateline( // @phpstan-ignore-line
+						$this->lines[$i]->id, 												// ID of line to change @phpstan-ignore-line
+						$this->lines[$i]->desc,												// Description @phpstan-ignore-line
+						$this->lines[$i]->subprice,											// Unit price @phpstan-ignore-line
+						$this->lines[$i]->qty,												// Quantity @phpstan-ignore-line
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,	// Discount percentage @phpstan-ignore-line
+						$mode == 'tva' ? $value : $this->lines[$i]->tva_tx,					// VAT rate @phpstan-ignore-line
+						$this->lines[$i]->localtax1_rate,									// Local tax 1 @phpstan-ignore-line
+						$this->lines[$i]->localtax2_rate,									// Local tax 2 @phpstan-ignore-line
+						'HT',																// Price base type @phpstan-ignore-line
+						$this->lines[$i]->info_bits,										// Info bits @phpstan-ignore-line
+						$this->lines[$i]->product_type,										// Type @phpstan-ignore-line
+						0,																	// Triggers @phpstan-ignore-line
+						$this->lines[$i]->date_start,										// Date start @phpstan-ignore-line
+						$this->lines[$i]->date_end,											// Date end @phpstan-ignore-line
+						$this->lines[$i]->array_options,									// Array of options @phpstan-ignore-line
+						$this->lines[$i]->fk_unit,											// FK unit @phpstan-ignore-line
+						$this->lines[$i]->multicurrency_subprice,							// Unit price in currency @phpstan-ignore-line
+						$this->lines[$i]->ref_supplier										// Ref fourn @phpstan-ignore-line
+					);
+				} elseif ($current_module == 'invoice_supplier') {
+					$result = $this->updateline( // @phpstan-ignore-line
+						$this->lines[$i]->id, 												// ID of line to change @phpstan-ignore-line
+						$this->lines[$i]->desc,												// Description @phpstan-ignore-line
+						$this->lines[$i]->subprice,											// Unit price @phpstan-ignore-line
+						$mode == 'tva' ? $value : $this->lines[$i]->tva_tx,					// VAT rate @phpstan-ignore-line
+						$this->lines[$i]->localtax1_rate,									// Local tax 1 @phpstan-ignore-line
+						$this->lines[$i]->localtax2_rate,									// Local tax 2 @phpstan-ignore-line
+						$this->lines[$i]->qty,												// Quantity @phpstan-ignore-line
+						$this->lines[$i]->fk_product,										// ID product @phpstan-ignore-line
+						'HT',																// Price base type @phpstan-ignore-line
+						$this->lines[$i]->info_bits,										// Info bits @phpstan-ignore-line
+						$this->lines[$i]->product_type,										// Type @phpstan-ignore-line
+						$mode == 'discount' ? $value : $this->lines[$i]->remise_percent,	// Discount percentage @phpstan-ignore-line
+						0,																	// Triggers @phpstan-ignore-line
+						$this->lines[$i]->date_start,										// Date start @phpstan-ignore-line
+						$this->lines[$i]->date_end,											// Date end @phpstan-ignore-line
+						$this->lines[$i]->array_options,									// Array of options @phpstan-ignore-line
+						$this->lines[$i]->fk_unit,											// FK unit @phpstan-ignore-line
+						$this->lines[$i]->multicurrency_subprice,							// Unit price in currency @phpstan-ignore-line
+						$this->lines[$i]->ref_supplier,										// Ref fourn @phpstan-ignore-line
+						$this->lines[$i]->rang												// Rang of line fourn @phpstan-ignore-line
+					);
 				}
 				if ($result < 0) {
 					return $result;
