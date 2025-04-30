@@ -108,7 +108,7 @@ if ($line->qty > 0) { ?>
 		print '<td class="linecoluht_currency"></td>';
 	}
 	// Handling colspan if MAIN_NO_INPUT_PRICE_WITH_TAX conf is enabled
-	if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX') && $object->element != 'facturerec') {
+	if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX') && !in_array($object->element, array('facturerec', 'invoice_supplier_rec'))) {
 		print '<td class="linecoluttc"></td>';
 	}
 
@@ -177,8 +177,8 @@ if ($line->qty > 0) { ?>
 	// Base colspan if there is no module activated to display line correctly
 	$colspan = 3;
 
-	// Handling colspan if the current object is a supplier proposal
-	if (in_array($object->element, array('supplier_proposal', 'order_supplier', 'invoice_supplier'))) {
+	// Handling colspan if the current object is a supplier document
+	if (in_array($object->element, array('supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec'))) {
 		$colspan += 1;
 	}
 
@@ -213,7 +213,7 @@ if ($line->qty > 0) { ?>
 	}
 
 	// Handling colspan if MAIN_NO_INPUT_PRICE_WITH_TAX conf is enabled
-	if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX') && $object->element != 'facturerec') {
+	if (!getDolGlobalInt('MAIN_NO_INPUT_PRICE_WITH_TAX') && !in_array($object->element, array('facturerec', 'invoice_supplier_rec'))) {
 		$colspan += 1;
 	}
 
