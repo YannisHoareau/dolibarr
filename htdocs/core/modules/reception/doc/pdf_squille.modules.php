@@ -423,6 +423,20 @@ class pdf_squille extends ModelePdfReception
 				// Loop on each lines
 				for ($i = 0; $i < $nblines; $i++) {
 					$curY = $nexY;
+
+					$line_extraparams = (array) $object->lines[$i]->extraparams;
+					$sub_options = array_key_exists("subtotal", $line_extraparams) ? (array) $line_extraparams["subtotal"] : array();
+
+					if (($curY + 6) > ($this->page_hauteur - $heightforfooter) || isset($sub_options['titleforcepagebreak']) && !($pdf->getNumPages() == 1 && $curY == $tab_top + $this->tabTitleHeight)) {
+						$pdf->AddPage();
+						if (!empty($tplidx)) {
+							$pdf->useTemplate($tplidx);
+						}
+
+						$pdf->setPage($pdf->getNumPages());
+						$nexY = $curY = $tab_top_newpage;
+					}
+
 					$pdf->SetFont('', '', $default_font_size - 1); // Into loop to work with multipage
 					$pdf->SetTextColor(0, 0, 0);
 
@@ -484,7 +498,27 @@ class pdf_squille extends ModelePdfReception
 					}*/
 
 					$pdf->startTransaction();
-					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc);
+
+					if ($object->lines[$i]->special_code == SUBTOTALS_SPECIAL_CODE) {
+						$bg_color = colorStringToArray(getDolGlobalString("SUBTOTAL_BACK_COLOR_LEVEL_".abs($object->lines[$i]->qty)));
+						$pdf->SetFillColor($bg_color[0], $bg_color[1], $bg_color[2]);
+						$pdf->SetXY($curX + 1, $curY);
+						$pdf->MultiCell($this->page_largeur - $this->marge_droite  - $this->marge_gauche - 2, 4, '', 0, 'R', true);
+						$previous_align = array();
+						$previous_align['align'] = $this->cols['desc']['content']['align'] ?? 'L';
+						if ($object->lines[$i]->qty < 0) {
+							$langs->load("subtotals");
+							$object->lines[$i]->desc = $langs->trans("SubtotalOf", $object->lines[$i]->desc);
+							if ($previous_align['align'] == 'L') {
+								$this->cols['desc']['content']['align'] = 'R';
+							} elseif ($previous_align['align'] == 'R') {
+								$this->cols['desc']['content']['align'] = 'L';
+							}
+						}
+					}
+
+					pdf_writelinedesc($pdf, $object, $i, $outputlangs, $this->posxpicture - $curX, 3, $curX, $curY, $hideref, $hidedesc, 1, $this->cols['desc']['content']['align'] ?? 'J');
+
 
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) {	// There is a pagebreak
@@ -522,6 +556,7 @@ class pdf_squille extends ModelePdfReception
 					} else { // No pagebreak
 						$pdf->commitTransaction();
 					}
+					$this->cols['desc']['content']['align'] = $previous_align['align'] ?? ''; // Re align if we printed a subtotal ligne
 					$posYAfterDescription = $pdf->GetY();
 
 					$nexY = max($pdf->GetY(), $posYAfterImage);
@@ -556,13 +591,13 @@ class pdf_squille extends ModelePdfReception
 						$voltxt = round($object->lines[$i]->product->volume * $object->lines[$i]->qty, 5).' '.measuringUnitString(0, "volume", $object->lines[$i]->product->volume_units ? $object->lines[$i]->product->volume_units : 0, 1);
 					}
 
-					if (!getDolGlobalString('RECEPTION_PDF_HIDE_WEIGHT_AND_VOLUME')) {
+					if (!getDolGlobalString('RECEPTION_PDF_HIDE_WEIGHT_AND_VOLUME') && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
 						$pdf->writeHTMLCell($this->posxqtyordered - $this->posxweightvol + 2, 3, $this->posxweightvol - 1, $curY, $weighttxt.(($weighttxt && $voltxt) ? '<br>' : '').$voltxt, 0, 0, false, true, 'C');
 						//$pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), 3, $weighttxt.(($weighttxt && $voltxt)?'<br>':'').$voltxt,'','C');
 					}
 
 					// Qty ordered
-					if (!getDolGlobalString('RECEPTION_PDF_HIDE_ORDERED')) {
+					if (!getDolGlobalString('RECEPTION_PDF_HIDE_ORDERED') && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
 						$pdf->SetXY($this->posxqtyordered, $curY);
 						if ($object->lines[$i]->fk_commandefourndet != $fk_commandefourndet) {
 							$pdf->MultiCell(($this->posxqtytoship - $this->posxqtyordered), 3, (string) $object->lines[$i]->qty_asked, '', 'C');
@@ -572,11 +607,13 @@ class pdf_squille extends ModelePdfReception
 					}
 
 					// Qty received
-					$pdf->SetXY($this->posxqtytoship, $curY);
-					$pdf->MultiCell(($this->posxpuht - $this->posxqtytoship), 3, (string) $object->lines[$i]->qty, '', 'C');
+					if ($object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
+						$pdf->SetXY($this->posxqtytoship, $curY);
+						$pdf->MultiCell(($this->posxpuht - $this->posxqtytoship), 3, (string) $object->lines[$i]->qty, '', 'C');
+					}
 
 					// Amount
-					if (getDolGlobalString('MAIN_PDF_RECEPTION_DISPLAY_AMOUNT_HT')) {
+					if (getDolGlobalString('MAIN_PDF_RECEPTION_DISPLAY_AMOUNT_HT') && $object->lines[$i]->special_code != SUBTOTALS_SPECIAL_CODE) {
 						$pdf->SetXY($this->posxpuht, $curY);
 						$pdf->MultiCell(($this->posxtotalht - $this->posxpuht - 1), 3, price($object->lines[$i]->subprice, 0, $outputlangs), '', 'R');
 
