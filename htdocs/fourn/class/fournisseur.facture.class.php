@@ -678,6 +678,13 @@ class FactureFournisseur extends CommonInvoice
 							$this->lines[$i]->multicurrency_subprice,
 							$this->lines[$i]->ref_supplier
 						);
+
+						// Saving extraparams in the new line
+						$line_object = new SupplierInvoiceLine($this->db);
+						$line_object->fetch($idligne);
+						$line_object->extraparams = $this->lines[$i]->extraparams;
+						$line_object->setExtraParameters();
+
 					} else {
 						$this->error = $this->db->lasterror();
 						$this->db->rollback();

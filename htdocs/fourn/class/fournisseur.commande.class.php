@@ -1700,7 +1700,7 @@ class CommandeFournisseur extends CommonOrder
 						$line->fk_unit,
 						$line->multicurrency_subprice,  // pu_ht_devise
 						$line->origin,     // origin
-						$line->origin_id,  // origin_id
+						$line->id,  // origin_id
 						$line->rang,       // rang
 						$line->special_code
 					);
@@ -2264,6 +2264,14 @@ class CommandeFournisseur extends CommonOrder
 						}
 
 						$this->lines[] = $this->line;
+					} else {
+						foreach ($this->lines as $line) {
+
+							if ($line->id == $origin_id) {
+								$this->line->extraparams = $line->extraparams;
+								$this->line->setExtraParameters();
+							}
+						}
 					}
 
 					$this->db->commit();
