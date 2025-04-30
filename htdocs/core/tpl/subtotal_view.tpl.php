@@ -73,7 +73,7 @@ if ($line->qty > 0) { ?>
 		?>
 	</td>
 	<?php
-	if (in_array($object->element, array('supplier_proposal', 'order_supplier', 'invoice_supplier'))) {
+	if (in_array($object->element, array('supplier_proposal', 'order_supplier', 'invoice_supplier', 'invoice_supplier_rec'))) {
 		print '<td class="linecolrefsupplier"></td>';
 	}
 	?>
