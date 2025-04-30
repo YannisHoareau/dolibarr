@@ -2266,7 +2266,6 @@ class CommandeFournisseur extends CommonOrder
 						$this->lines[] = $this->line;
 					} else {
 						foreach ($this->lines as $line) {
-
 							if ($line->id == $origin_id) {
 								$this->line->extraparams = $line->extraparams;
 								$this->line->setExtraParameters();
