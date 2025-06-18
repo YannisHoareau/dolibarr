@@ -143,6 +143,15 @@ if (!defined('NOSESSION')) {
 // Init the 6 global objects, this include will make the 'new Xxx()' and set properties for: $conf, $db, $langs, $user, $mysoc, $hookmanager
 require_once 'master.inc.php';
 
+// Test if called from public page and hidden conf MAIN_FORCE_PUBLIC_ROOT is set
+$currentUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':\/\/' . $_SERVER['HTTP_HOST'];
+if (defined('NOPRIVATEPAGE') && !empty(NOPRIVATEPAGE)) {
+	if (getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT') !== null && !preg_match('/'.$currentUrl.'/', getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT'))) {
+		print 'Public pages only accessible from public url.';
+		exit;
+	}
+}
+
 // Uncomment this and set session.save_handler = user to use local session storing
 // include DOL_DOCUMENT_ROOT.'/core/lib/phpsessionindb.inc.php
 
