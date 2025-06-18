@@ -27,17 +27,17 @@ global $langs;
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
 	<?php
 	//$jNotifyCSSUrl = $context->rootUrl.'includes/jquery/plugins/jnotify/jquery.jnotify.css';
-	$jNotifyCSSUrl = dol_buildpath('/includes/jquery/plugins/jnotify/jquery.jnotify.min.css', 2);
+	$jNotifyCSSUrl = dolBuildPublicPath('/includes/jquery/plugins/jnotify/jquery.jnotify.min.css', 2);
 	print '<link rel="stylesheet" href="'.$jNotifyCSSUrl.' ">'."\n";
 
 	// JQuery
 	//$jQueryJSUrl = $context->rootUrl.'includes/jquery/js/jquery.js';
-	$jQueryJSUrl = dol_buildpath('/includes/jquery/js/jquery.js', 2);
+	$jQueryJSUrl = dolBuildPublicPath('/includes/jquery/js/jquery.js', 2);
 	print '<script src="'.$jQueryJSUrl.'"></script>'."\n";
 
 	// JNotify
 	//$jNotifyJSUrl = $context->rootUrl.'includes/jquery/plugins/jnotify/jquery.jnotify.js';
-	$jNotifyJSUrl = dol_buildpath('/includes/jquery/plugins/jnotify/jquery.jnotify.min.js', 2);
+	$jNotifyJSUrl = dolBuildPublicPath('/includes/jquery/plugins/jnotify/jquery.jnotify.min.js', 2);
 	print '<script src="'.$jNotifyJSUrl.'"></script>'."\n";
 	?>
 </head>

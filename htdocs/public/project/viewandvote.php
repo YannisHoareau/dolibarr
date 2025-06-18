@@ -209,7 +209,7 @@ if ($idvote > 0) {
 	} elseif ($votestatus == "err") {
 		setEventMessage($langs->trans("VoteError"), 'warnings');
 	}
-	header("Refresh:0;url=".dol_buildpath('/public/project/viewandvote.php?id='.$id.'&securekey=', 1).$securekeyreceived);
+	header("Refresh:0;url=".dolBuildPublicPath('/public/project/viewandvote.php?id='.$id.'&securekey=', 1).$securekeyreceived);
 	exit;
 }
 

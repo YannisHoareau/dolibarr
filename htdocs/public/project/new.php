@@ -248,7 +248,7 @@ if (empty($reshook) && $action == 'add') {	// Test on permission not required he
 		$filefound = 0;
 		$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 		foreach ($dirmodels as $reldir) {
-			$file = dol_buildpath($reldir."core/modules/project/".$modele.'.php', 0);
+			$file = dolBuildPublicPath($reldir."core/modules/project/".$modele.'.php', 0);
 			if (file_exists($file)) {
 				$filefound = 1;
 				$classname = $modele;

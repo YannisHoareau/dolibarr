@@ -1639,6 +1639,77 @@ function dol_buildpath($path, $type = 0, $returnemptyifnotfound = 0)
 }
 
 /**
+ *	Return a path for public pages, using a public root if MAIN_FORCE_PUBLIC_ROOT is set, dolibarr main url root if not
+ *
+ * 	@param	string	$path						Relative path to file (if mode=0) or relative url (if mode=1). Ie: mydir/myfile, ../myfile
+ *  @param	int		$type						0=Used for an URL path (output relative),
+ *  											1=Used for an URL path (output full path using same host that current url),
+ *  											2=Used for an URL path (output full path using host defined into $dolibarr_main_url_root of conf file, for an access from internet)
+ *  @return string								Full filesystem path (if path=0) or '' if file not found, Full url path (if mode=1)
+ */
+function dolBuildPublicPath($path, $type = 0)
+{
+	global $conf;
+//	var_dump(getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT'));
+	$path = preg_replace('/^\//', '', $path);
+
+	$domain_to_use = defined('NOPRIVATEPAGE') && !empty(NOPRIVATEPAGE) && !empty(getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT')) ? getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT') : DOL_MAIN_URL_ROOT;
+
+	$res = '';
+	if ($type == 1) {
+		$res = '/'.$path; // Standard value
+	}
+	if ($type == 2) {
+		$res = $domain_to_use.'/'.$path; // Standard value
+	}
+	if ($type == 3) {
+		$res = '/'.$path;
+
+	}
+
+	foreach ($conf->file->dol_document_root as $key => $dirroot) {	// ex: array(["main"]=>"/home/main/htdocs", ["alt0"]=>"/home/dirmod/htdocs", ...)
+		if ($key == 'main') {
+			if ($type == 3) {
+				/*global $dolibarr_main_url_root;*/
+
+				// Define $urlwithroot
+				$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($conf->file->dol_main_url_root));
+				$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domain name found into config file
+				//$urlwithroot=DOL_MAIN_URL_ROOT;					// This is to use same domain name than current
+
+				$res = (preg_match('/^http/i', $conf->file->dol_url_root[$key]) ? '' : $urlwithroot).'/'.$path; // Test on start with http is for old conf syntax
+			}
+			continue;
+		}
+		$regs = array();
+		preg_match('/^([^\?]+(\.css\.php|\.css|\.js\.php|\.js|\.png|\.jpg|\.php)?)/i', $path, $regs); // Take part before '?'
+		if (!empty($regs[1])) {
+			//print $key.'-'.$dirroot.'/'.$path.'-'.$conf->file->dol_url_root[$type].'<br>'."\n";
+			//if (file_exists($dirroot.'/'.$regs[1])) {
+			if (@file_exists($dirroot.'/'.$regs[1])) {	// avoid [php:warn]
+				if ($type == 1) {
+					$res = (preg_match('/^http/i', $conf->file->dol_url_root[$key]) ? '' : DOL_URL_ROOT).$conf->file->dol_url_root[$key].'/'.$path;
+				} elseif ($type == 2) {
+					$res = (preg_match('/^http/i', $conf->file->dol_url_root[$key]) ? '' : DOL_MAIN_URL_ROOT).$conf->file->dol_url_root[$key].'/'.$path;
+				} elseif ($type == 3) {
+					/*global $dolibarr_main_url_root;*/
+
+					// Define $urlwithroot
+					$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($conf->file->dol_main_url_root));
+					$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domain name found into config file
+					//$urlwithroot=DOL_MAIN_URL_ROOT;					// This is to use same domain name than current
+
+					$res = (preg_match('/^http/i', $conf->file->dol_url_root[$key]) ? '' : $urlwithroot).$conf->file->dol_url_root[$key].'/'.$path; // Test on start with http is for old conf syntax
+				}
+				break;
+			}
+		}
+	}
+
+	return $res;
+}
+
+/**
  *	Get properties for an object - including magic properties when requested
  *
  *	Only returns properties that exist

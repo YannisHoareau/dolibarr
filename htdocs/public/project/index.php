@@ -190,17 +190,17 @@ function llxFooterVierge()  // @phan-suppress-current-line PhanRedefineFunction
  */
 
 if (GETPOST('suggestbooth')) {
-	header("Location: ".dol_buildpath('/public/project/suggestbooth.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
+	header("Location: ".dolBuildPublicPath('/public/project/suggestbooth.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
 	exit;
 }
 
 if (GETPOST('suggestconference')) {
-	header("Location: ".dol_buildpath('/public/project/suggestconference.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
+	header("Location: ".dolBuildPublicPath('/public/project/suggestconference.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
 	exit;
 }
 
 if (GETPOST('viewandvote')) {
-	header("Location: ".dol_buildpath('/public/project/viewandvote.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
+	header("Location: ".dolBuildPublicPath('/public/project/viewandvote.php', 1).'?id='.$id."&securekey=".$securekeyreceived);
 	exit;
 }
 

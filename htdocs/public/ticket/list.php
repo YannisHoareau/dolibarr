@@ -221,7 +221,7 @@ if ($action == "view_ticketlist") {
 		$search_fk_user_assign = GETPOST("search_fk_user_assign", "intcomma");
 
 		// Store current page url
-		$url_page_current = dol_buildpath('/public/ticket/list.php', 1);
+		$url_page_current = dolBuildPublicPath('/public/ticket/list.php', 1);
 		$contextpage = $url_page_current;
 
 		// Do we click on purge search criteria ?
@@ -726,7 +726,7 @@ if ($action == "view_ticketlist") {
 
 				print '</form>';
 
-				$url_public_ticket = getDolGlobalString('TICKET_URL_PUBLIC_INTERFACE', dol_buildpath('/public/ticket/', 1));
+				$url_public_ticket = getDolGlobalString('TICKET_URL_PUBLIC_INTERFACE', dolBuildPublicPath('/public/ticket/', 1));
 
 				print '<form method="POST" id="form_view_ticket" name="form_view_ticket" action="'.$url_public_ticket.'view.php'.(!empty($entity) && isModEnabled('multicompany') ? '?entity='.$entity : '').'" style="display:none;">';
 				print '<input type="hidden" name="token" value="'.newToken().'">';
