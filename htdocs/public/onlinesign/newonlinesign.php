@@ -41,6 +41,9 @@ if (!defined('NOIPCHECK')) {
 if (!defined('NOBROWSERNOTIF')) {
 	define('NOBROWSERNOTIF', '1');
 }
+if (!defined('NOPRIVATEPAGE')) {
+	define('NOPRIVATEPAGE', '1');
+}
 
 // For MultiCompany module.
 // Do not use GETPOST here, function is not defined and define must be done before including main.inc.php
