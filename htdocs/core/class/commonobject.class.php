@@ -1199,7 +1199,8 @@ abstract class CommonObject
 			}
 		}
 		// Define $urlwithroot
-		$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
+		$domain_to_use = defined('NOPRIVATEPAGE') && !empty(NOPRIVATEPAGE) && !empty(getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT')) ? getDolGlobalString('MAIN_FORCE_PUBLIC_ROOT') : $dolibarr_main_url_root;
+		$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($domain_to_use));
 		// This is to use external domain name found into config file
 		//if (DOL_URL_ROOT && ! preg_match('/\/$/', $urlwithouturlroot) && ! preg_match('/^\//', DOL_URL_ROOT)) $urlwithroot=$urlwithouturlroot.'/'.DOL_URL_ROOT;
 		//else
